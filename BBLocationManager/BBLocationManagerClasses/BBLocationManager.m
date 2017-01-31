@@ -1,0 +1,647 @@
+//
+//  BBLocationManager.m
+//  SDK_iOS_DATA
+//
+//  Created by Benzamin on 4/15/15.
+//  Copyright (c) 2015 Benzamin. All rights reserved.
+//
+
+#import "BBLocationManager.h"
+#import <CoreLocation/CLGeocoder.h>
+#import <UIKit/UIKit.h>
+
+#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)	([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
+#define BB_TIMESTAMP_DDMMYYYYHHMMSS @"dd-MM-YYYY HH:mm:ss"
+
+static inline BOOL isEmptyString( NSString * _Null_unspecified str)
+{
+    if(str.length==0 || [str isKindOfClass:[NSNull class]] || [str isEqualToString:@""]|| [str isEqualToString:@"(null)"]||str==nil || [str isEqualToString:@"<null>"]){
+        return YES;
+    }
+    return NO;
+}
+
+
+//This enum is only used to track what kind of work I need to do inside
+//the method -locationManager:didUpdateLocations:
+typedef enum : NSUInteger {
+    LocationTaskTypeGetCurrentLocation,
+    LocationTaskTypeAddFenceToCurrentLocation,
+    LocationTaskTypeGetGeoCodeAddress,
+    LocationTaskTypeNone
+} LocationTaskType;
+
+@interface BBLocationManager()<CLLocationManagerDelegate>
+{
+    BOOL _didStartMonitoringRegion;
+    CLLocationDistance _radiousParam;
+    NSString *_identifierParam;
+    
+    
+}
+@property (strong, nonatomic) CLLocationManager *locationManager;
+@property (strong, nonatomic) NSMutableArray *geofences;
+@property (strong, nonatomic) CLGeocoder *geocoder;
+@property(nonatomic, copy) LocationUpdateBlock locationCompletionBlock;
+@property(nonatomic, copy) GeoCodeUpdateBlock geocodeCompletionBlock;
+@property(nonatomic, assign) LocationTaskType activeLocationTaskType;
+
+@end
+
+@implementation BBLocationManager
+
+@synthesize delegate = _delegate;
+
++ (id)sharedManager {
+    static BBLocationManager *sharedMyManager = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedMyManager = [[self alloc] init];
+    });
+    return sharedMyManager;
+}
+
+-(instancetype)init
+{
+    if(self == [super init])
+    {
+        // Initialize Location Manager
+        self.locationManager = [[CLLocationManager alloc] init];
+        
+        // Configure Location Manager
+        [self.locationManager setDelegate:self];
+        
+        //initially lets guess its 100 meters
+        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyHundredMeters];
+        
+        [self startUpdatingLocation];
+        
+        self.activeLocationTaskType = LocationTaskTypeNone;
+        self.lastKnownGeocodeAddress = @{};
+        self.lastKnownGeoLocation = @{};
+        
+        self.geofences = [NSMutableArray arrayWithArray:[[self.locationManager monitoredRegions] allObjects]];
+        
+        _didStartMonitoringRegion = NO;
+        _radiousParam = 0;
+        _identifierParam = nil;
+
+    }
+    
+    return self;
+}
+
+- (void)startUpdatingLocation
+{
+    
+    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
+        CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
+        
+        if ((status == kCLAuthorizationStatusNotDetermined) && ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)] || [self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)])) {
+            
+            if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"]) {
+                [self.locationManager performSelector:@selector(requestAlwaysAuthorization)];
+            } else if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"]) {
+                [self.locationManager performSelector:@selector(requestWhenInUseAuthorization)];
+            } else {
+                
+                [[NSException exceptionWithName:@"[BBLocationManager] Location Permission Error" reason:@"Info.plist does not contain NSLocationWhenUse or NSLocationAlwaysUsageDescription key required for iOS 8" userInfo:nil] raise];
+            }
+        }
+    }
+    
+}
+
+#pragma mark -
+#pragma mark - Public Methods
+
+-(NSArray*)getCurrentFences
+{
+    NSArray *existingArray = [[self.locationManager monitoredRegions] allObjects];
+    
+    NSMutableArray *existingFenceInfoArray = [NSMutableArray arrayWithCapacity:existingArray.count];
+    for (CLCircularRegion *currentRegion in existingArray)
+    {
+        [existingFenceInfoArray addObject:[self fenceInfoForRegion:currentRegion fenceEventType:BBFenceEventTypeNone]];
+    }
+    if(existingFenceInfoArray.count == 0) return nil;
+    
+    return existingFenceInfoArray;
+}
+
+-(void)deleteCurrentFences
+{
+    NSArray *existingArray = [[self.locationManager monitoredRegions] allObjects];
+    for (CLCircularRegion *currentRegion in existingArray)
+    {
+#warning Temp Fix for deleting extra fences in Yatzy.
+        //we only want to delete all the fences those we created
+        //NSRange startRange = [currentRegion.identifier rangeOfString:@"BB: "];
+        //if(startRange.location != NSNotFound) //commenting this as we want to delete all the fences for now
+        //{
+            // Stop Monitoring Region
+            [self.locationManager stopMonitoringForRegion:currentRegion];
+            
+            // Update list
+            [self.geofences removeObject:currentRegion];
+        //}
+    }
+
+}
+
+- (void)getCurrentLocationWithDelegate:(id)delegate
+{
+    self.delegate = delegate;
+    self.activeLocationTaskType = LocationTaskTypeGetCurrentLocation;
+    //dont get confused between [self startUpdatingLocation] and [self.locationManager startUpdatingLocation]...I got confused once, and paid the price :(
+    [self.locationManager startUpdatingLocation];
+}
+
+- (void)getCurrentLocationWithCompletion:(LocationUpdateBlock)completion
+{
+    self.locationCompletionBlock = completion;
+    self.activeLocationTaskType = LocationTaskTypeGetCurrentLocation;
+    [self.locationManager startUpdatingLocation];
+}
+
+- (void)getCurrentGeocodeAddressWithDelegate:(id)delegate
+{
+    self.delegate = delegate;
+    self.activeLocationTaskType = LocationTaskTypeGetGeoCodeAddress;
+    [self.locationManager startUpdatingLocation];
+    
+}
+
+- (void)getCurrentGeoCodeAddressWithCompletion:(GeoCodeUpdateBlock)completion
+{
+    self.geocodeCompletionBlock = completion;
+    self.activeLocationTaskType = LocationTaskTypeGetGeoCodeAddress;
+    [self.locationManager startUpdatingLocation];
+}
+
+- (void)addGeofenceAtCurrentLocation
+{
+    [self addGeofenceAtCurrentLocationWithRadious:BB_DEFAULT_FENCE_RADIOUS];
+}
+
+- (void)addGeofenceAtCurrentLocationWithRadious:(CLLocationDistance)radious
+{
+    //TODO: Need to chage this kCLLocationAccuracyNearestTenMeters to others
+    if(radious < 50.0f)
+    {
+        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyBest];
+    }
+    if(radious >= 50.0f && radious <= 100.0f)
+    {
+        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyNearestTenMeters];
+    }
+    else if(radious > 100.0f && radious <= 500.0f)
+    {
+        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyHundredMeters];
+    }
+    
+    [self addGeofenceAtCurrentLocationWithRadious:radious withIdentifier:nil];
+    
+}
+
+- (void)addGeofenceAtCurrentLocationWithRadious:(CLLocationDistance)radious withIdentifier:(NSString*)identifier
+{
+    //store the radious and identifier
+    _radiousParam = radious;
+    _identifierParam = identifier;
+
+    // Update Helper
+    _didStartMonitoringRegion = NO;
+    
+    // Start Updating Location, once we get a location, we'll add a fence
+    self.activeLocationTaskType = LocationTaskTypeAddFenceToCurrentLocation;
+    [self.locationManager startUpdatingLocation];
+}
+
+- (void)addGeofenceAtlatitude:(double)latitude andLongitude:(double)longitude withRadious:(double)radious withIdentifier:(NSString*)identifier
+{
+    [self addGeofenceAtCoordinates:CLLocationCoordinate2DMake(latitude, longitude) withRadious:radious withIdentifier:identifier];
+}
+
+- (void)addGeofenceAtCoordinates:(CLLocationCoordinate2D)coordinate withRadious:(CLLocationDistance)radious withIdentifier:(NSString*)identifier
+{
+    CLLocation *location = [[CLLocation alloc] initWithLatitude:coordinate.latitude longitude:coordinate.longitude];
+    [self addGeofenceAtLocation:location withRadious:radious withIdentifier:identifier];
+}
+
+- (void)addGeofenceAtLocation:(CLLocation*)location withRadious:(CLLocationDistance)radious withIdentifier:(NSString*)identifier
+{
+
+    /*------------------first check if we already have these coordinates inside existing regions----------*/
+    CLCircularRegion *currentRegion = [self isFenceExistsForCoordinates:location.coordinate];
+    if(currentRegion != nil)
+    {
+        //NSLog(@"[BBLocationManager] Fence already exist for area: %@ ---- inside: %@", identifier, currentRegion.identifier);
+        if([self.delegate respondsToSelector:@selector(BBLocationManagerDidAddFence:)])
+        {
+            [self.delegate BBLocationManagerDidAddFence:[self fenceInfoForRegion:currentRegion fenceEventType:BBFenceEventTypeRepeated]];
+        }
+        return;
+    }
+    
+    
+    /*------------------if this coordinates doesnot already added to a geofence, start the fence---------------------*/
+
+    //if there is a identifier provided, don't try to geocode the location
+    if(isEmptyString(identifier))
+    {
+        [self startMonitoringRegionWithCeter:location.coordinate radious:radious identifier:identifier];
+    }
+    
+    //no identifier provided, try to geocode the location
+    else
+    {
+        __block CLLocationCoordinate2D loc = location.coordinate;
+        __block double rad = radious;
+        
+        if (!self.geocoder)
+        {
+            self.geocoder = [[CLGeocoder alloc] init];
+        }
+        BBLocationManager * __weak weakSelf = self;
+        [self.geocoder reverseGeocodeLocation:location completionHandler:^(NSArray* placemarks, NSError* error){
+            
+            if ([placemarks count] > 0)
+            {
+                //got a adddress
+                CLPlacemark *mark = (CLPlacemark*)[placemarks objectAtIndex:0];// read the most confident one
+                NSString *name = mark.name ? mark.name : @"$" ;
+                NSString *thoroughfare = mark.thoroughfare ? mark.thoroughfare : @"$" ;
+                NSString *subLocality = mark.subLocality ? mark.subLocality : @"$" ;
+                NSString *locality = mark.locality ? mark.locality : @"$" ;
+                NSString *subAdministrativeArea = mark.subAdministrativeArea ? mark.subAdministrativeArea : @"$" ;
+                NSString *administrativeArea = mark.administrativeArea ? mark.administrativeArea : @"$" ;
+                NSString *postalcode = mark.postalCode ? mark.postalCode : @"$" ;
+                NSString *ISOcountryCode = mark.ISOcountryCode ? mark.ISOcountryCode : @"$" ;
+                
+                NSString *address = [NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@",name, thoroughfare, subLocality, locality, subAdministrativeArea, administrativeArea, postalcode, ISOcountryCode];
+                address = [address stringByReplacingOccurrencesOfString:@"$," withString:@""];
+                
+                [weakSelf startMonitoringRegionWithCeter:loc radious:rad identifier:isEmptyString(address) ? address : [NSString stringWithFormat:@"%lf_%lf_%lf", loc.latitude, loc.longitude, rad]];
+                
+            }
+            else
+            {
+                
+                [weakSelf startMonitoringRegionWithCeter:loc radious:rad identifier:[NSString stringWithFormat:@"%lf_%lf_%lf", loc.latitude, loc.longitude, rad]];
+            }
+            
+        }];
+    
+    }
+}
+
+- (void)getGeoCodeAtLocation:(CLLocation*)location
+{
+    if (!self.geocoder)
+    {
+        self.geocoder = [[CLGeocoder alloc] init];
+    }
+    BBLocationManager * __weak weakSelf = self;
+    [self.geocoder reverseGeocodeLocation:location completionHandler:^(NSArray* placemarks, NSError* error){
+        
+        if ([placemarks count] > 0)
+        {
+            //got a adddress
+            
+            CLPlacemark *mark = (CLPlacemark*)[placemarks objectAtIndex:0];// read the most confident one
+            NSString *name = mark.name ? mark.name : @"" ;
+            NSString *thoroughfare = mark.thoroughfare ? mark.thoroughfare : @"" ;
+            NSString *locality = mark.locality ? mark.locality : @"" ;
+            NSString *subAdministrativeArea = mark.subAdministrativeArea ? mark.subAdministrativeArea : @"" ;
+            NSString *administrativeArea = mark.administrativeArea ? mark.administrativeArea : @"" ;
+            NSString *postalcode = mark.postalCode ? mark.postalCode : @"" ;
+            NSString *country = mark.country ? mark.country : @"" ;
+            NSLog(@"Updated Address:%@", mark.addressDictionary.description);
+            
+            weakSelf.lastKnownGeocodeAddress = @{
+                                                 BB_ADDRESS_NAME    : name,
+                                                 BB_ADDRESS_STREET  : thoroughfare,
+                                                 BB_ADDRESS_CITY    : locality,
+                                                 BB_ADDRESS_STATE   : administrativeArea,
+                                                 BB_ADDRESS_COUNTY  : subAdministrativeArea,
+                                                 BB_ADDRESS_ZIPCODE : postalcode,
+                                                 BB_ADDRESS_COUNTY  : country,
+                                                 BB_ADDRESS_DICTIONARY: mark.addressDictionary
+                                                 };
+            
+        }
+        else
+        {
+            weakSelf.lastKnownGeocodeAddress = @{
+                                                 BB_ADDRESS_NAME    : @"Unknown",
+                                                 BB_ADDRESS_STREET  : @"Unknown",
+                                                 BB_ADDRESS_CITY    : @"Unknown",
+                                                 BB_ADDRESS_STATE   : @"Unknown",
+                                                 BB_ADDRESS_COUNTY  : @"Unknown",
+                                                 BB_ADDRESS_ZIPCODE : @"Unknown",
+                                                 BB_ADDRESS_COUNTY  : @"Unknown",
+                                                 BB_ADDRESS_DICTIONARY: @{}
+                                                 };
+            
+            
+        }
+        
+        //send through delegate
+        if([weakSelf.delegate respondsToSelector:@selector(BBLocationManagerDidUpdateGeocodeAdress:)])
+        {
+            [weakSelf.delegate BBLocationManagerDidUpdateGeocodeAdress:weakSelf.lastKnownGeocodeAddress];
+        }
+        if(weakSelf.geocodeCompletionBlock != nil)
+        {
+            self.geocodeCompletionBlock(!error ? true : false, weakSelf.lastKnownGeoLocation, error);
+        }
+        
+        
+    }];
+    
+}
+
+
+-(void)addGeoFenceUsingFenceInfo:(BBFenceInfo*)fenceInfo
+{
+    CLLocationCoordinate2D coordinate = [self locationCoordinate2dFromFenceInfo:fenceInfo];
+    [self addGeofenceAtCoordinates:coordinate withRadious:[[fenceInfo.fenceCoordinate objectForKey:BB_RADIOUS] doubleValue] withIdentifier:fenceInfo.fenceIDentifier];
+}
+
+-(void)deleteGeoFenceWithIdentifier:(NSString*)identifier
+{
+    NSArray *existingArray = [[self.locationManager monitoredRegions] allObjects];
+    for (CLCircularRegion *currentRegion in existingArray)
+    {
+        NSRange startRange = [currentRegion.identifier rangeOfString:identifier];
+        if(startRange.location != NSNotFound)
+        {
+            // Stop Monitoring Region
+            [self.locationManager stopMonitoringForRegion:currentRegion];
+            
+            // Update list
+            [self.geofences removeObject:currentRegion];
+        }
+    }
+
+}
+
+-(void)deleteGeoFence:(BBFenceInfo*)fenceInfo
+{
+    [self deleteGeoFenceWithIdentifier:[NSString stringWithFormat:@"BB: %@", fenceInfo.fenceIDentifier]];
+}
+
+
+#pragma mark -
+#pragma mark - Internal Methods
+
+-(void)startMonitoringRegionWithCeter:(CLLocationCoordinate2D)center radious:(CLLocationDistance)radious identifier:(NSString*)identifier
+{
+    CLRegion * region ;
+    region = [[CLCircularRegion alloc] initWithCenter:center radius:radious identifier:[NSString stringWithFormat:@"BB: %@", identifier]];
+    
+    
+    // Start Monitoring Region
+    [self.locationManager startMonitoringForRegion:region];
+    
+    //update array
+    [self.geofences addObject:region];
+}
+
+-(BBFenceInfo*)fenceInfoForRegion:(CLRegion*)fenceRegion fenceEventType:(BBFenceEventType)type
+{
+    CLCircularRegion *region = (CLCircularRegion*)fenceRegion;
+    BBFenceInfo *info = [[BBFenceInfo alloc] init];
+    info.eventTimeStamp = [self currentTimeStampWithFormat:BB_TIMESTAMP_DDMMYYYYHHMMSS];
+    info.eventType = BB_GET_FENCE_EVENT_STRING(type);
+    info.fenceIDentifier = region.identifier;
+    info.fenceCoordinate = @{ BB_LATITUDE:[NSNumber numberWithDouble: region.center.latitude], BB_LONGITUDE:[NSNumber numberWithDouble: region.center.longitude], BB_RADIOUS:[NSNumber numberWithDouble: region.radius]};
+
+    return info;
+}
+
+-(CLCircularRegion*)isFenceExistsForCoordinates:(CLLocationCoordinate2D)coordinate
+{
+    NSArray *existingArray = [[self.locationManager monitoredRegions] allObjects];
+    for (CLCircularRegion *currentRegion in existingArray)
+    {
+        if([currentRegion containsCoordinate:coordinate])
+        {
+            return currentRegion;
+        }
+    }
+    return nil;
+    
+}
+
+-(CLLocationCoordinate2D)locationCoordinate2dFromFenceInfo:(BBFenceInfo*)fenceInfo
+{
+    return CLLocationCoordinate2DMake([[fenceInfo.fenceCoordinate objectForKey:BB_LATITUDE] doubleValue], [[fenceInfo.fenceCoordinate objectForKey:BB_LONGITUDE] doubleValue]);
+}
+#pragma mark - CLLocationManagerDelegate methods
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+{
+    if (locations && [locations count])
+    {
+        // Fetch Current Location
+        CLLocation *location = [locations objectAtIndex:0];
+        
+        if(self.activeLocationTaskType == LocationTaskTypeGetGeoCodeAddress)
+        {
+            // Initialize Region/fence to Monitor
+            [self getGeoCodeAtLocation:location];
+            
+            //stop getting/updating location data, means stop the GPS :)
+            [self.locationManager stopUpdatingLocation];
+        }
+
+        
+        else if(self.activeLocationTaskType == LocationTaskTypeAddFenceToCurrentLocation)
+        {
+            if(!_didStartMonitoringRegion)
+            {
+                // Update Helper
+                _didStartMonitoringRegion = YES;
+                
+                
+                // Initialize Region/fence to Monitor
+                [self addGeofenceAtLocation:location withRadious:_radiousParam withIdentifier:_identifierParam];
+                
+                //stop getting/updating location data, means stop the GPS :)
+                [self.locationManager stopUpdatingLocation];
+            }
+        }
+        
+        else if(self.activeLocationTaskType == LocationTaskTypeGetCurrentLocation)
+        {
+            NSDictionary *locationDict = @{BB_LATITUDE:[NSNumber numberWithDouble:location.coordinate.latitude] , BB_LONGITUDE:[NSNumber numberWithDouble: location.coordinate.longitude] , BB_ALTITUDE:[NSNumber numberWithDouble:location.altitude]};
+            
+            if([self.delegate respondsToSelector:@selector(BBLocationManagerDidUpdateLocation:)])
+            {
+                [self.delegate BBLocationManagerDidUpdateLocation:locationDict];
+            }
+            if(self.locationCompletionBlock != nil)
+            {
+                self.locationCompletionBlock(true, locationDict, nil);
+            }
+            //stop getting/updating location data, means stop the GPS
+            [self.locationManager stopUpdatingLocation];
+
+            
+        }
+
+        self.activeLocationTaskType = LocationTaskTypeNone;
+        
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
+{
+    if([self.delegate respondsToSelector:@selector(BBLocationManagerDidUpdateLocation:)])
+    {
+        [self.delegate BBLocationManagerDidUpdateLocation:@{BB_LATITUDE:[NSNumber numberWithDouble:0.0f] , BB_LONGITUDE:[NSNumber numberWithDouble:0.0f] , BB_ALTITUDE:[NSNumber numberWithDouble:0.0f]}];
+    }
+    if(self.locationCompletionBlock != nil)
+    {
+        self.locationCompletionBlock(false, nil, error);
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didStartMonitoringForRegion:(CLRegion *)region
+{
+    CLCircularRegion *theRegion = (CLCircularRegion*)region;
+    if([self.delegate respondsToSelector:@selector(BBLocationManagerDidAddFence:)])
+    {
+        [self.delegate BBLocationManagerDidAddFence:[self fenceInfoForRegion:theRegion fenceEventType:BBFenceEventTypeAdded]];
+    }
+
+//#warning Remove this
+//    NSString *str = [NSString stringWithFormat:@"Added region %@, lat-long-radious:%@", region.identifier,[NSString stringWithFormat:@"%.1f - %.1f - %f", region.center.latitude, region.center.longitude, region.radius]];
+    //[[[UIAlertView alloc] initWithTitle:@"Gefence Alert" message:str delegate:nil cancelButtonTitle:@"ok" otherButtonTitles:nil] show];
+        //NSLog(str);
+}
+
+-(void)locationManager:(CLLocationManager *)manager monitoringDidFailForRegion:(CLRegion *)region withError:(NSError *)error
+{
+    CLCircularRegion *theRegion = (CLCircularRegion*)region;
+    if([self.delegate respondsToSelector:@selector(BBLocationManagerDidFailedFence:)])
+    {
+        [self.delegate BBLocationManagerDidFailedFence:[self fenceInfoForRegion:theRegion fenceEventType:BBFenceEventTypeFailed]];
+    }
+    
+//#warning Remove this
+//    NSString *str = [NSString stringWithFormat:@"Failed region %@, lat-long-radious:%@", region.identifier,[NSString stringWithFormat:@"%.1f - %.1f - %f", region.center.latitude, region.center.longitude, region.radius]];
+    //[[[UIAlertView alloc] initWithTitle:@"Gefence Alert" message:str delegate:nil cancelButtonTitle:@"ok" otherButtonTitles:nil] show];
+    //NSLog(str);
+}
+
+
+- (void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region
+{
+    CLCircularRegion *theRegion = (CLCircularRegion*)region;
+    if([self.delegate respondsToSelector:@selector(BBLocationManagerDidEnterFence:)])
+    {
+        [self.delegate BBLocationManagerDidEnterFence:[self fenceInfoForRegion:theRegion fenceEventType:BBFenceEventTypeEnterFence]];
+    }
+    
+//#warning Remove this
+//    NSString *str = [NSString stringWithFormat:@"Entered region %@, lat-long-radious:%@", theRegion.identifier,[NSString stringWithFormat:@"%.1f - %.1f - %f", theRegion.center.latitude, theRegion.center.longitude, theRegion.radius]];
+//    [[[UIAlertView alloc] initWithTitle:@"Gefence Alert" message:str delegate:nil cancelButtonTitle:@"ok" otherButtonTitles:nil] show];
+//    [BBUtility initiateLocalNotification:str withDate:[NSDate date] badgeCount:1 withEventType:@"Region-Enter"];
+//    NSLog(str);
+}
+
+- (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region
+{
+    CLCircularRegion *theRegion = (CLCircularRegion*)region;
+    if([self.delegate respondsToSelector:@selector(BBLocationManagerDidExitFence:)])
+    {
+        [self.delegate BBLocationManagerDidExitFence:[self fenceInfoForRegion:theRegion fenceEventType:BBFenceEventTypeExitFence]];
+    }
+    
+//#warning Remove this
+//    NSString *str = [NSString stringWithFormat:@"Exit region %@, lat-long-radious:%@", theRegion.identifier,[NSString stringWithFormat:@"%.1f - %.1f - %f", theRegion.center.latitude, theRegion.center.longitude, theRegion.radius]];
+//    [[[UIAlertView alloc] initWithTitle:@"Gefence Alert" message:str delegate:nil cancelButtonTitle:@"ok" otherButtonTitles:nil] show];
+//    [BBUtility initiateLocalNotification:str withDate:[NSDate date] badgeCount:1 withEventType:@"Region-exit"];
+//    NSLog(str);
+    
+    
+}
+
+- (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region
+{
+    if(state == CLRegionStateInside)
+    {
+        //NSLog(@"[BBLocationManager] Entered Region - %@", region.identifier);
+    }
+    else if(state == CLRegionStateOutside)
+    {
+        //NSLog(@"[BBLocationManager] Exited Region - %@", region.identifier);
+    }
+    else{
+        //NSLog(@"[BBLocationManager] Unknown state  Region - %@", region.identifier);
+    }
+    
+}
+
+#pragma mark -
+#pragma mark - Helper Functions.
+- (NSNumber*)calculateDistanceInMetersBetweenCoord:(CLLocationCoordinate2D)coord1 coord:(CLLocationCoordinate2D)coord2 {
+    NSInteger nRadius = 6371; // Earth's radius in Kilometers
+    double latDiff = (coord2.latitude - coord1.latitude) * (M_PI/180);
+    double lonDiff = (coord2.longitude - coord1.longitude) * (M_PI/180);
+    double lat1InRadians = coord1.latitude * (M_PI/180);
+    double lat2InRadians = coord2.latitude * (M_PI/180);
+    double nA = pow ( sin(latDiff/2), 2 ) + cos(lat1InRadians) * cos(lat2InRadians) * pow ( sin(lonDiff/2), 2 );
+    double nC = 2 * atan2( sqrt(nA), sqrt( 1 - nA ));
+    double nD = nRadius * nC;
+    // convert to meters
+    return @(nD*1000);
+}
+
++ (BOOL)locationPermission
+{
+    BOOL isPermitted = YES;
+    
+    if(![CLLocationManager locationServicesEnabled])
+    {
+        //You need to enable Location Services
+    }
+    if(![CLLocationManager isMonitoringAvailableForClass:[CLRegion class]])
+    {
+        //Region monitoring is not available for this Class;
+    }
+    
+    
+    CLAuthorizationStatus locationPermission = [CLLocationManager authorizationStatus];
+    
+    if ((locationPermission == kCLAuthorizationStatusRestricted) || (locationPermission == kCLAuthorizationStatusDenied)) {
+        isPermitted = NO;
+    }
+    
+    if (isPermitted && SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0") && locationPermission == kCLAuthorizationStatusNotDetermined) {
+        isPermitted = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"] || [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"];
+    }
+    
+    return isPermitted;
+}
+
+-(void)dealloc
+{
+    
+}
+
+-(NSString*)currentTimeStampWithFormat:(NSString*)format
+{
+    NSDateFormatter *dateFormattter = [[NSDateFormatter alloc] init];
+    
+    //[dateFormat setDateFormat:@"YYYY-MM-dd\'T\'HH:mm:ssZZZZZ"];
+    [dateFormattter setDateFormat:format];
+    
+    return [dateFormattter stringFromDate:[NSDate date]];
+}
+
+
+@end
