@@ -153,17 +153,81 @@ typedef void(^GeoCodeUpdateBlock)(BOOL success, NSDictionary *geoCodeDictionary,
  */
 - (void)getCurrentLocationWithCompletion:(LocationUpdateBlock)completion;
 
+
+/**
+ *   Returns current location's geocode address
+ *   <p>
+ *   Gives the currents location's geocode addres using BBLocationManagerDelegate, uses Apple's own geocode API to get teh current address
+ *   </p>
+ *   @return BBLocationManagerDidUpdateGeocodeAdress is called when the location and geocode is updated
+ */
 - (void)getCurrentGeocodeAddressWithDelegate:(id)delegate;
 
+/**
+ *   Returns current location's geocode address
+ *   <p>
+ *   Gives the currents location's geocode addres using given block, uses Apple's own geocode API to get teh current address
+ *   </p>
+ *   @return Callback block is called when the location and geocode is updated
+ */
 - (void)getCurrentGeoCodeAddressWithCompletion:(GeoCodeUpdateBlock)completion;
 
+/**
+ *   Adds a geofence at the current location
+ *   <p>
+ *   First updates current location of the device, and then add it as a Geofence. Optionally also tries to determine the Geocode/Address. Default radios of the fence is set to 100 meters
+ *   </p>
+ *   <p>
+ *   Checks if there is already a fence exists in this coordinate, if so, fires delegate BBLocationManagerDidAddFence: with a BBFenceEventTypeRepeated event.
+ *   </p>
+ *   @warning When using this method for adding multiple fence at once, reverse geocoding method may fail for too many request in small amount of time.
+ *   @return fires delegate BBLocationManagerDidAddFence: with a BBFenceEventTypeAdded event.
+ */
 
 - (void)addGeofenceAtCurrentLocation;
 
+/**
+ *   Adds a geofence at the current location with a radious
+ *   <p>
+ *   First updates current location of the device, and then add it as a Geofence. Optionally also tries to determine the Geocode/Address. Also sets the radious of the fence with given value
+ *   </p>
+ *   <p>
+ *   Checks if there is already a fence exists in this coordinate, if so, fires delegate BBLocationManagerDidAddFence: with a BBFenceEventTypeRepeated event.
+ *   </p>
+ *   @warning When using this method for adding multiple fence at once, reverse geocoding method may fail for too many request in small amount of time.
+ *   @param radious: The radious for the fence
+ *   @return fires delegate BBLocationManagerDidAddFence: with a BBFenceEventTypeAdded event.
+ */
 - (void)addGeofenceAtCurrentLocationWithRadious:(CLLocationDistance)radious;
+
+/**
+ *   Adds a geofence at given latitude/longitude, radious and indentifer.
+ *   <p>
+ *   Checks if there is already a fence exists in this coordinate, if so, fires delegate BBLocationManagerDidAddFence: with a BBFenceEventTypeRepeated event.
+ *   </p>
+ *   @warning When using this method for adding multiple fence at once, always deliver Identifier value, otherwise the reverse geocoding method may fail for too many request in small amount of time.
+ *   @param latitude: The latitude where to add the fence
+ *   @param longitude: The longitude where to add the fence
+ *   @param radious: The radious for the fence
+ *   @param identifier: The name of the fence. If the indentifier is nil, this method will try to use geocode to determine the address of this coordinate and use it as identifer. WARNING: When using this method for adding multiple fence at once, always deliver Identifier value
+ *   @return fires delegate BBLocationManagerDidAddFence: with a BBFenceEventTypeAdded event.
+ */
 
 - (void)addGeofenceAtlatitude:(double)latitude andLongitude:(double)longitude withRadious:(double)radious withIdentifier:(NSString*)identifier;
 
+
+/**
+ *   Adds a geofence at given latitude/longitude, radious and indentifer.
+ *   <p>
+ *   Checks if there is already a fence exists in this coordinate, if so, fires delegate BBLocationManagerDidAddFence: with a BBFenceEventTypeRepeated event.
+ *   </p>
+ *   @warning When using this method for adding multiple fence at once, always deliver Identifier value, otherwise the reverse geocoding method may fail for too many request in small amount of time.
+ *   @param latitude: The latitude where to add the fence
+ *   @param longitude: The longitude where to add the fence
+ *   @param radious: The radious for the fence
+ *   @param identifier: The name of the fence. If the indentifier is nil, this method will try to use geocode to determine the address of this coordinate and use it as identifer. WARNING: When using this method for adding multiple fence at once, always deliver Identifier value
+ *   @return fires delegate BBLocationManagerDidAddFence: with a BBFenceEventTypeAdded event.
+ */
 - (void)addGeofenceAtCurrentLocationWithRadious:(CLLocationDistance)radious withIdentifier:(NSString*)identifier;
 
 /**
@@ -172,7 +236,7 @@ typedef void(^GeoCodeUpdateBlock)(BOOL success, NSDictionary *geoCodeDictionary,
  *   Checks if there is already a fence exists in this coordinate, if so, fires delegate BBLocationManagerDidAddFence: with a BBFenceEventTypeRepeated event.
  *   </p>
  *   @warning When using this method for adding multiple fence at once, always deliver Identifier value, otherwise the reverse geocoding method may fail for too many request in small amount of time.
- *   @param coordinate: The coordinate where to add the fence
+ *   @param coordinate: The coordinate as CLLocationCoordinate2D where to add the fence
  *   @param radious: The radious for the fence
  *   @param identifier: The name of the fence. If the indentifier is nil, this method will try to use geocode to determine the address of this coordinate and use it as identifer. WARNING: When using this method for adding multiple fence at once, always deliver Identifier value
  *   @return fires delegate BBLocationManagerDidAddFence: with a BBFenceEventTypeAdded event.
@@ -208,11 +272,20 @@ typedef void(^GeoCodeUpdateBlock)(BOOL success, NSDictionary *geoCodeDictionary,
 /**
  *   Deletes a geofence at a location, using the FenceInfo object
  *   <p>
- *   It seraches for the  identifiers of the added fences, and deletes the desired one.
+ *   It searches for the  identifiers of the added fences based on fenceInfo, and deletes the desired one.
  *   </p>
  *   @param fenceInfo: The location where to add the fence
  */
 
 -(void)deleteGeoFence:(BBFenceInfo*)fenceInfo;
+
+/**
+ *   Deletes a geofence with a identifier
+ *   <p>
+ *   It searches for the  identifiers of the added fences, and deletes the desired one.
+ *   </p>
+ *   @param identifier: The identifier of the geofence need to be deleted
+ */
+-(void)deleteGeoFenceWithIdentifier:(NSString*)identifier;
 
 @end

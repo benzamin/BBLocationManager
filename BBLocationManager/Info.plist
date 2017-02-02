@@ -44,6 +44,12 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Application need to use your location permission</string>
+	<string>Application need to use your location permission for background activity</string>
+	<key>NSLocationWhenInUseUsageDescription-INACTIVE</key>
+	<string>Application need to use your location permission when using the app</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 </dict>
 </plist>

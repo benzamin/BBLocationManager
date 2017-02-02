@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -17,20 +18,20 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="BBLocationManager" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="21W-ZR-DKt">
-                                <rect key="frame" x="57" y="61" width="281" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="BBLocationManager" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="21W-ZR-DKt">
+                                <rect key="frame" x="88" y="30" width="199" height="27"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Geofence and GeoCode Enabled" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1Zj-1x-Bz4">
-                                <rect key="frame" x="72" y="90" width="250" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Geofence and GeoCode Enabled" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1Zj-1x-Bz4">
+                                <rect key="frame" x="63" y="65" width="250" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l0z-OM-jKs">
-                                <rect key="frame" x="100" y="165" width="194" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l0z-OM-jKs">
+                                <rect key="frame" x="91" y="116" width="194" height="30"/>
                                 <state key="normal" title="Get Current Location &amp; Print">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -38,8 +39,8 @@
                                     <action selector="getCurrentLocation:" destination="BYZ-38-t0r" eventType="touchUpInside" id="MGY-uO-8Tt"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iJy-Bz-D73">
-                                <rect key="frame" x="110" y="319" width="174" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iJy-Bz-D73">
+                                <rect key="frame" x="101" y="230" width="174" height="30"/>
                                 <state key="normal" title="Print All Geofences to log">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -47,8 +48,8 @@
                                     <action selector="showAllGeoFences:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Isf-Vg-ijQ"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UIo-Hr-Sle">
-                                <rect key="frame" x="82" y="270" width="229" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UIo-Hr-Sle">
+                                <rect key="frame" x="73" y="192" width="229" height="30"/>
                                 <state key="normal" title="Add Geofence at Current location">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -56,8 +57,8 @@
                                     <action selector="addFenceGeoatCurrentLocation:" destination="BYZ-38-t0r" eventType="touchUpInside" id="UQg-za-xyf"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tbQ-OS-UIU">
-                                <rect key="frame" x="122" y="366" width="146" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tbQ-OS-UIU">
+                                <rect key="frame" x="115" y="268" width="146" height="30"/>
                                 <state key="normal" title="Remove All Geofence">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -65,24 +66,54 @@
                                     <action selector="removeAllGeofence:" destination="BYZ-38-t0r" eventType="touchUpInside" id="mDX-YM-0oA"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L93-Yc-2um">
-                                <rect key="frame" x="56" y="216" width="282" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L93-Yc-2um">
+                                <rect key="frame" x="47" y="154" width="282" height="30"/>
                                 <state key="normal" title="Get Current GeoLocation Address &amp; Print">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <action selector="getCurrentGeoFence:" destination="BYZ-38-t0r" eventType="touchUpInside" id="YRz-OJ-fRN"/>
-                                    <action selector="getCurrentLocation:" destination="BYZ-38-t0r" eventType="touchUpInside" id="RHz-VN-gqW"/>
                                 </connections>
                             </button>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Log:" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xqP-oA-ELf">
+                                <rect key="frame" x="16" y="306" width="343" height="341"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                <dataDetectorType key="dataDetectorTypes" phoneNumber="YES" link="YES" address="YES"/>
+                            </textView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="L93-Yc-2um" firstAttribute="top" secondItem="l0z-OM-jKs" secondAttribute="bottom" constant="8" id="3bk-yC-llZ"/>
+                            <constraint firstItem="1Zj-1x-Bz4" firstAttribute="top" secondItem="21W-ZR-DKt" secondAttribute="bottom" constant="8" id="5Xd-Ig-crU"/>
+                            <constraint firstItem="21W-ZR-DKt" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="6TS-wf-9IV"/>
+                            <constraint firstItem="xqP-oA-ELf" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="99h-Wh-hI0"/>
+                            <constraint firstItem="xqP-oA-ELf" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="GzH-Se-ua5"/>
+                            <constraint firstItem="tbQ-OS-UIU" firstAttribute="centerX" secondItem="iJy-Bz-D73" secondAttribute="centerX" id="Nof-4d-Jrk"/>
+                            <constraint firstItem="21W-ZR-DKt" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="10" id="ODb-8e-Nir"/>
+                            <constraint firstItem="l0z-OM-jKs" firstAttribute="centerX" secondItem="1Zj-1x-Bz4" secondAttribute="centerX" id="RB5-Yx-Q4G"/>
+                            <constraint firstItem="l0z-OM-jKs" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="SYv-K2-mYK"/>
+                            <constraint firstItem="tbQ-OS-UIU" firstAttribute="top" secondItem="iJy-Bz-D73" secondAttribute="bottom" constant="8" id="Ubb-UC-xB2"/>
+                            <constraint firstItem="xqP-oA-ELf" firstAttribute="top" secondItem="tbQ-OS-UIU" secondAttribute="bottom" constant="8" id="alD-WL-Pg8"/>
+                            <constraint firstItem="UIo-Hr-Sle" firstAttribute="top" secondItem="L93-Yc-2um" secondAttribute="bottom" constant="8" id="axi-3A-Pdy"/>
+                            <constraint firstItem="iJy-Bz-D73" firstAttribute="top" secondItem="UIo-Hr-Sle" secondAttribute="bottom" constant="8" id="ciP-eg-0ap"/>
+                            <constraint firstItem="iJy-Bz-D73" firstAttribute="centerX" secondItem="UIo-Hr-Sle" secondAttribute="centerX" id="eiY-IH-slY"/>
+                            <constraint firstItem="UIo-Hr-Sle" firstAttribute="centerX" secondItem="L93-Yc-2um" secondAttribute="centerX" id="gjI-uZ-KN0"/>
+                            <constraint firstItem="1Zj-1x-Bz4" firstAttribute="centerX" secondItem="21W-ZR-DKt" secondAttribute="centerX" id="jPy-Le-bFy"/>
+                            <constraint firstItem="l0z-OM-jKs" firstAttribute="top" secondItem="1Zj-1x-Bz4" secondAttribute="bottom" constant="30" id="p6O-ku-Qzx"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="xqP-oA-ELf" secondAttribute="bottom" constant="20" id="roL-KF-Ar4"/>
+                            <constraint firstItem="L93-Yc-2um" firstAttribute="centerX" secondItem="l0z-OM-jKs" secondAttribute="centerX" id="weu-Jy-8nv"/>
+                        </constraints>
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
+                    <connections>
+                        <outlet property="logTextView" destination="xqP-oA-ELf" id="Bv5-C1-ywP"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="470" y="357"/>
+            <point key="canvasLocation" x="368.5" y="335.5"/>
         </scene>
     </scenes>
 </document>
