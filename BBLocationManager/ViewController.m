@@ -28,12 +28,14 @@
     BBLocationManager *manager = [BBLocationManager sharedManager];
     
     NSArray *geoFences = [manager getCurrentFences];
+    NSString *allFencetxt = @"All fences: ";
     for (BBFenceInfo *geofence in geoFences)
     {
-        NSString *txt = [NSString stringWithFormat:@"Geofence '%@' is Active at Coordinates: %@:%@ with %@ meter radious", geofence.fenceIDentifier, [geofence.fenceCoordinate objectForKey:BB_LATITUDE],[geofence.fenceCoordinate objectForKey:BB_LONGITUDE], [geofence.fenceCoordinate objectForKey:BB_RADIOUS]];
+        NSString *txt = [NSString stringWithFormat:@"Geofence '%@' is Active at Coordinates: %@:%@ with %@ meter radious \n", geofence.fenceIDentifier, [geofence.fenceCoordinate objectForKey:BB_LATITUDE],[geofence.fenceCoordinate objectForKey:BB_LONGITUDE], [geofence.fenceCoordinate objectForKey:BB_RADIOUS]];
         NSLog(@"%@", txt);
-        [self logtext:txt];
+        allFencetxt = [allFencetxt stringByAppendingString:txt];
     }
+    [self logtext:allFencetxt];
     if(geoFences.count == 0) [self logtext:@"No Geofence is added currently"];
 }
 
@@ -106,7 +108,7 @@
     NSString *text = [NSString stringWithFormat:@"Entered GeoFence: %@", fenceInfo.dictionary.description];
     NSLog(@"%@", text);
     [self logtext:text];
-    [[[UIAlertView alloc] initWithTitle:@"Enter Fence" message:text delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil] show];
+    [self showLocalNotification:[NSString stringWithFormat:@"Enter Fence %@", text] withDate:[NSDate dateWithTimeIntervalSinceNow:1]];
 }
 
 
@@ -115,7 +117,7 @@
     NSString *text =[NSString stringWithFormat:@"Exit GeoFence: %@", fenceInfo.dictionary.description];
     NSLog(@"%@", text);
     [self logtext:text];
-    [[[UIAlertView alloc] initWithTitle:@"Exit Fence" message:text delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil] show];
+    [self showLocalNotification:[NSString stringWithFormat:@"Exit Fence %@", text] withDate:[NSDate dateWithTimeIntervalSinceNow:1]];
 }
 
 
@@ -130,6 +132,24 @@
      NSLog(@"Current Location GeoCode/Address: %@", addressDictionary.description);
 }
 
+#pragma mark-  Other methods
+
+-(void)showLocalNotification:(NSString*)notificationBody withDate:(NSDate*)notificationDate
+{
+    UIApplication *app                = [UIApplication sharedApplication];
+    UILocalNotification *notification = [[UILocalNotification alloc] init];
+    
+    notification.fireDate  = notificationDate;
+    notification.timeZone  = [NSTimeZone defaultTimeZone];
+    notification.alertBody = notificationBody;
+    notification.soundName = UILocalNotificationDefaultSoundName;
+    //notification.applicationIconBadgeNumber = badgeCount;
+    
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+    //[userInfo setValue:eventType forKey:@"event_type"];
+    [notification setUserInfo:userInfo];
+    [app scheduleLocalNotification:notification];
+}
 
 
 
