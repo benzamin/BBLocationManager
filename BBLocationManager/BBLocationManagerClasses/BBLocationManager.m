@@ -1,6 +1,5 @@
 //
 //  BBLocationManager.m
-//  SDK_iOS_DATA
 //
 //  Created by Benzamin on 4/15/15.
 //  Copyright (c) 2015 Benzamin. All rights reserved.
@@ -26,6 +25,8 @@ static inline BOOL isEmptyString( NSString * _Null_unspecified str)
 //the method -locationManager:didUpdateLocations:
 typedef enum : NSUInteger {
     LocationTaskTypeGetCurrentLocation,
+    LocationTaskTypeGetContiniousLocation,
+    LocationTaskTypeGetSignificantChangeLocation,
     LocationTaskTypeAddFenceToCurrentLocation,
     LocationTaskTypeGetGeoCodeAddress,
     LocationTaskTypeNone
@@ -54,7 +55,7 @@ typedef enum : NSUInteger {
 
 #pragma mark - Public methods
 
-+ (id)sharedManager {
++ (instancetype)sharedManager {
     static BBLocationManager *sharedMyManager = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -73,8 +74,11 @@ typedef enum : NSUInteger {
         // Configure Location Manager
         [self.locationManager setDelegate:self];
         
+        //setting the default distance filter
+        [self setDistanceFilter:100];//setting it default to 100 meters
+        
         //initially lets guess its 100 meters
-        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyHundredMeters];
+        [self setDesiredAcuracy:100];
         
         //[self getPermissionForStartUpdatingLocation];
         
@@ -143,6 +147,46 @@ typedef enum : NSUInteger {
 
 #pragma mark - Public Methods
 
+-(NSDictionary*)location
+{
+    if(!self.locationManager.location)
+        return nil;
+    
+    NSDictionary *locationDict = @{BB_LATITUDE:[NSNumber numberWithDouble:self.locationManager.location.coordinate.latitude] , BB_LONGITUDE:[NSNumber numberWithDouble: self.locationManager.location.coordinate.longitude] , BB_ALTITUDE:[NSNumber numberWithDouble:self.locationManager.location.altitude]};
+    return locationDict;
+}
+
+-(void)setDistanceFilter:(double)distanceFilter
+{
+    _distanceFilter = distanceFilter;
+    [self.locationManager setDistanceFilter:distanceFilter];
+}
+
+-(void)setDesiredAcuracy:(double)desiredAcuracy
+{
+    _desiredAcuracy = desiredAcuracy;
+    if(desiredAcuracy < 50.0f) //1 to 49 meters
+    {
+        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyBest];
+    }
+    else if(desiredAcuracy >= 50.0f && desiredAcuracy < 100.0f) //50 to 99 meters
+    {
+        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyNearestTenMeters];
+    }
+    else if(desiredAcuracy >= 100.0f && desiredAcuracy < 500.0f) //100 to 499 meters
+    {
+        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyHundredMeters];
+    }
+    else if(desiredAcuracy >= 500.0f && desiredAcuracy <= 1000.0f) //500 to 1000 meters
+    {
+        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyKilometer];
+    }
+    else //greater then 1000 meters 
+    {
+        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyThreeKilometers];
+    }
+}
+
 -(NSArray*)getCurrentFences
 {
     NSArray *existingArray = [[self.locationManager monitoredRegions] allObjects];
@@ -205,6 +249,32 @@ typedef enum : NSUInteger {
     self.activeLocationTaskType = LocationTaskTypeGetGeoCodeAddress;
     [self startUpdatingLocation];
 }
+-(void)getContiniousLocationWithDelegate:(id)delegate
+{
+    self.delegate = delegate;
+    self.activeLocationTaskType = LocationTaskTypeGetContiniousLocation;
+    [self startUpdatingLocation];
+}
+
+-(void)getSingificantLocationChangeWithDelegate:(id)delegate
+{
+    self.delegate = delegate;
+    self.activeLocationTaskType = LocationTaskTypeGetSignificantChangeLocation;
+    [self startUpdatingLocation];
+}
+
+-(void)stopGettingLocation
+{
+    if(self.activeLocationTaskType == LocationTaskTypeGetContiniousLocation)
+    {
+        [self.locationManager stopUpdatingLocation];
+    }
+    else if(self.activeLocationTaskType == LocationTaskTypeGetSignificantChangeLocation)
+    {
+        [self.locationManager stopMonitoringSignificantLocationChanges];
+    }
+    self.activeLocationTaskType = LocationTaskTypeNone;
+}
 
 - (void)addGeofenceAtCurrentLocation
 {
@@ -213,27 +283,7 @@ typedef enum : NSUInteger {
 
 - (void)addGeofenceAtCurrentLocationWithRadious:(CLLocationDistance)radious
 {
-    if(radious < 50.0f)
-    {
-        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyBest];
-    }
-    else if(radious >= 50.0f && radious <= 100.0f)
-    {
-        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyNearestTenMeters];
-    }
-    else if(radious > 100.0f && radious <= 500.0f)
-    {
-        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyHundredMeters];
-    }
-    else if(radious > 500.0f && radious <= 1000.0f)
-    {
-        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyKilometer];
-    }
-    else
-    {
-        [self.locationManager setDesiredAccuracy:kCLLocationAccuracyThreeKilometers];
-    }
-    
+    [self setDesiredAcuracy:radious];
     
     [self addGeofenceAtCurrentLocationWithRadious:radious withIdentifier:nil];
     
@@ -462,7 +512,16 @@ typedef enum : NSUInteger {
         }
 
     }
-    [self.locationManager startUpdatingLocation];
+    
+    if(self.activeLocationTaskType == LocationTaskTypeGetSignificantChangeLocation)
+    {
+        [self.locationManager stopUpdatingLocation];
+        [self.locationManager startMonitoringSignificantLocationChanges];
+    }
+    else
+    {
+        [self.locationManager startUpdatingLocation];
+    }
 }
 
 
@@ -525,6 +584,7 @@ typedef enum : NSUInteger {
             
             //stop getting/updating location data, means stop the GPS :)
             [self.locationManager stopUpdatingLocation];
+            self.activeLocationTaskType = LocationTaskTypeNone;
         }
 
         
@@ -541,6 +601,7 @@ typedef enum : NSUInteger {
                 
                 //stop getting/updating location data, means stop the GPS :)
                 [self.locationManager stopUpdatingLocation];
+                self.activeLocationTaskType = LocationTaskTypeNone;
             }
         }
         
@@ -559,11 +620,27 @@ typedef enum : NSUInteger {
             }
             //stop getting/updating location data, means stop the GPS
             [self.locationManager stopUpdatingLocation];
+            self.activeLocationTaskType = LocationTaskTypeNone;
 
             
         }
+        else if((self.activeLocationTaskType == LocationTaskTypeGetContiniousLocation) || (self.activeLocationTaskType == LocationTaskTypeGetSignificantChangeLocation))
+        {
+            NSDictionary *locationDict = @{BB_LATITUDE:[NSNumber numberWithDouble:location.coordinate.latitude] , BB_LONGITUDE:[NSNumber numberWithDouble: location.coordinate.longitude] , BB_ALTITUDE:[NSNumber numberWithDouble:location.altitude]};
+            self.lastKnownGeoLocation = locationDict;
+            
+            if([self.delegate respondsToSelector:@selector(BBLocationManagerDidUpdateLocation:)])
+            {
+                [self.delegate BBLocationManagerDidUpdateLocation:locationDict];
+            }
+        }
+        else
+        {
+            self.activeLocationTaskType = LocationTaskTypeNone;
+        }
+        
 
-        self.activeLocationTaskType = LocationTaskTypeNone;
+        
         
     }
 }

@@ -1,6 +1,5 @@
 //
 //  BBFenceInfo.h
-//  SDK_iOS_DATA
 //
 //  Created by Benzamin on 4/23/15.
 //  Copyright (c) 2015 Benzamin. All rights reserved.

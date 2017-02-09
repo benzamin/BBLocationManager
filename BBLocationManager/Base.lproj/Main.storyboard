@@ -4,6 +4,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -19,92 +20,138 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="BBLocationManager" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="21W-ZR-DKt">
-                                <rect key="frame" x="88" y="30" width="199" height="27"/>
+                                <rect key="frame" x="88" y="25" width="199" height="27"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Geofence and GeoCode Enabled" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1Zj-1x-Bz4">
-                                <rect key="frame" x="63" y="65" width="250" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <rect key="frame" x="82" y="52" width="211" height="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l0z-OM-jKs">
-                                <rect key="frame" x="91" y="116" width="194" height="30"/>
-                                <state key="normal" title="Get Current Location &amp; Print">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l0z-OM-jKs">
+                                <rect key="frame" x="6" y="99" width="176" height="29"/>
+                                <color key="backgroundColor" red="0.1019607843" green="0.60784313729999995" blue="0.87843137250000003" alpha="0.74832974137931041" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
+                                <state key="normal" title="Get Current Location"/>
                                 <connections>
                                     <action selector="getCurrentLocation:" destination="BYZ-38-t0r" eventType="touchUpInside" id="MGY-uO-8Tt"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iJy-Bz-D73">
-                                <rect key="frame" x="101" y="230" width="174" height="30"/>
-                                <state key="normal" title="Print All Geofences to log">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iJy-Bz-D73">
+                                <rect key="frame" x="6" y="185" width="176" height="29"/>
+                                <color key="backgroundColor" red="0.24313725489999999" green="0.59607843140000005" blue="0.47450980390000003" alpha="0.75156250000000002" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
+                                <state key="normal" title="Print All Geofences"/>
                                 <connections>
                                     <action selector="showAllGeoFences:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Isf-Vg-ijQ"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UIo-Hr-Sle">
-                                <rect key="frame" x="73" y="192" width="229" height="30"/>
-                                <state key="normal" title="Add Geofence at Current location">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UIo-Hr-Sle">
+                                <rect key="frame" x="47" y="148" width="282" height="29"/>
+                                <color key="backgroundColor" red="0.24313725489999999" green="0.59607843140000005" blue="0.47450980390000003" alpha="0.75156250000000002" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
+                                <state key="normal" title="Add Geofence at Current location"/>
                                 <connections>
                                     <action selector="addFenceGeoatCurrentLocation:" destination="BYZ-38-t0r" eventType="touchUpInside" id="UQg-za-xyf"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tbQ-OS-UIU">
-                                <rect key="frame" x="115" y="268" width="146" height="30"/>
-                                <state key="normal" title="Remove All Geofence">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tbQ-OS-UIU">
+                                <rect key="frame" x="193" y="185" width="176" height="29"/>
+                                <color key="backgroundColor" red="0.24313725489999999" green="0.59607843140000005" blue="0.47450980390000003" alpha="0.75156250000000002" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
+                                <state key="normal" title="Remove All Geofence"/>
                                 <connections>
                                     <action selector="removeAllGeofence:" destination="BYZ-38-t0r" eventType="touchUpInside" id="mDX-YM-0oA"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L93-Yc-2um">
-                                <rect key="frame" x="47" y="154" width="282" height="30"/>
-                                <state key="normal" title="Get Current GeoLocation Address &amp; Print">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L93-Yc-2um">
+                                <rect key="frame" x="193" y="99" width="176" height="29"/>
+                                <color key="backgroundColor" red="0.1019607843" green="0.60784313729999995" blue="0.87843137250000003" alpha="0.74832974137931041" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
+                                <state key="normal" title="Get Geocode Address"/>
                                 <connections>
                                     <action selector="getCurrentGeoFence:" destination="BYZ-38-t0r" eventType="touchUpInside" id="YRz-OJ-fRN"/>
                                 </connections>
                             </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Log:" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xqP-oA-ELf">
-                                <rect key="frame" x="16" y="306" width="343" height="341"/>
+                                <rect key="frame" x="6" y="320" width="363" height="337"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <dataDetectorType key="dataDetectorTypes" phoneNumber="YES" link="YES" address="YES"/>
                             </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tgJ-kl-MEa">
+                                <rect key="frame" x="6" y="271" width="176" height="29"/>
+                                <color key="backgroundColor" red="0.44478645179640192" green="0.39088661879504272" blue="0.87843137250000003" alpha="0.75156250000000002" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
+                                <state key="normal" title="Continious Location"/>
+                                <connections>
+                                    <action selector="getContiniousLocation:" destination="BYZ-38-t0r" eventType="touchUpInside" id="0WE-j8-OUv"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jBm-Tc-mAq">
+                                <rect key="frame" x="193" y="271" width="176" height="29"/>
+                                <color key="backgroundColor" red="0.44478645179640192" green="0.39088661879504272" blue="0.87843137250000003" alpha="0.75156250000000002" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
+                                <state key="normal" title="Stop All Location"/>
+                                <connections>
+                                    <action selector="stopGettingLocation" destination="BYZ-38-t0r" eventType="touchUpInside" id="tWe-2p-sjJ"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mjo-fU-W5q">
+                                <rect key="frame" x="47" y="234" width="282" height="29"/>
+                                <color key="backgroundColor" red="0.44478645179640192" green="0.39088661879504272" blue="0.87843137250000003" alpha="0.75156250000000002" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
+                                <state key="normal" title="Get Significant Location Change"/>
+                                <connections>
+                                    <action selector="getSignificantLocationChange:" destination="BYZ-38-t0r" eventType="touchUpInside" id="DM1-rh-Gy4"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="L93-Yc-2um" firstAttribute="top" secondItem="l0z-OM-jKs" secondAttribute="bottom" constant="8" id="3bk-yC-llZ"/>
-                            <constraint firstItem="1Zj-1x-Bz4" firstAttribute="top" secondItem="21W-ZR-DKt" secondAttribute="bottom" constant="8" id="5Xd-Ig-crU"/>
-                            <constraint firstItem="21W-ZR-DKt" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="6TS-wf-9IV"/>
-                            <constraint firstItem="xqP-oA-ELf" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="99h-Wh-hI0"/>
-                            <constraint firstItem="xqP-oA-ELf" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="GzH-Se-ua5"/>
-                            <constraint firstItem="tbQ-OS-UIU" firstAttribute="centerX" secondItem="iJy-Bz-D73" secondAttribute="centerX" id="Nof-4d-Jrk"/>
-                            <constraint firstItem="21W-ZR-DKt" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="10" id="ODb-8e-Nir"/>
-                            <constraint firstItem="l0z-OM-jKs" firstAttribute="centerX" secondItem="1Zj-1x-Bz4" secondAttribute="centerX" id="RB5-Yx-Q4G"/>
-                            <constraint firstItem="l0z-OM-jKs" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="SYv-K2-mYK"/>
-                            <constraint firstItem="tbQ-OS-UIU" firstAttribute="top" secondItem="iJy-Bz-D73" secondAttribute="bottom" constant="8" id="Ubb-UC-xB2"/>
-                            <constraint firstItem="xqP-oA-ELf" firstAttribute="top" secondItem="tbQ-OS-UIU" secondAttribute="bottom" constant="8" id="alD-WL-Pg8"/>
-                            <constraint firstItem="UIo-Hr-Sle" firstAttribute="top" secondItem="L93-Yc-2um" secondAttribute="bottom" constant="8" id="axi-3A-Pdy"/>
-                            <constraint firstItem="iJy-Bz-D73" firstAttribute="top" secondItem="UIo-Hr-Sle" secondAttribute="bottom" constant="8" id="ciP-eg-0ap"/>
-                            <constraint firstItem="iJy-Bz-D73" firstAttribute="centerX" secondItem="UIo-Hr-Sle" secondAttribute="centerX" id="eiY-IH-slY"/>
-                            <constraint firstItem="UIo-Hr-Sle" firstAttribute="centerX" secondItem="L93-Yc-2um" secondAttribute="centerX" id="gjI-uZ-KN0"/>
-                            <constraint firstItem="1Zj-1x-Bz4" firstAttribute="centerX" secondItem="21W-ZR-DKt" secondAttribute="centerX" id="jPy-Le-bFy"/>
-                            <constraint firstItem="l0z-OM-jKs" firstAttribute="top" secondItem="1Zj-1x-Bz4" secondAttribute="bottom" constant="30" id="p6O-ku-Qzx"/>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="xqP-oA-ELf" secondAttribute="bottom" constant="20" id="roL-KF-Ar4"/>
-                            <constraint firstItem="L93-Yc-2um" firstAttribute="centerX" secondItem="l0z-OM-jKs" secondAttribute="centerX" id="weu-Jy-8nv"/>
+                            <constraint firstItem="1Zj-1x-Bz4" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="0Qb-uY-WEN"/>
+                            <constraint firstItem="jBm-Tc-mAq" firstAttribute="width" secondItem="tgJ-kl-MEa" secondAttribute="width" id="3TV-uW-ZN7"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="L93-Yc-2um" secondAttribute="trailing" constant="-10" id="5LQ-ta-txc"/>
+                            <constraint firstItem="mjo-fU-W5q" firstAttribute="top" secondItem="tbQ-OS-UIU" secondAttribute="bottom" constant="20" id="5ta-g1-J43"/>
+                            <constraint firstItem="tgJ-kl-MEa" firstAttribute="top" secondItem="mjo-fU-W5q" secondAttribute="bottom" constant="8" id="7qi-2J-VpT"/>
+                            <constraint firstItem="l0z-OM-jKs" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" multiplier="0.47" id="CAG-wN-pta"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="xqP-oA-ELf" secondAttribute="trailing" constant="-10" id="DHx-GH-NzL"/>
+                            <constraint firstItem="jBm-Tc-mAq" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" constant="10" id="DT8-IF-1ei"/>
+                            <constraint firstItem="tgJ-kl-MEa" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" multiplier="0.47" id="F1F-n9-X3z"/>
+                            <constraint firstItem="L93-Yc-2um" firstAttribute="width" secondItem="l0z-OM-jKs" secondAttribute="width" id="GJm-V8-Y0Q"/>
+                            <constraint firstItem="21W-ZR-DKt" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="KUz-oJ-80F"/>
+                            <constraint firstItem="UIo-Hr-Sle" firstAttribute="top" secondItem="L93-Yc-2um" secondAttribute="bottom" constant="20" id="L1H-tC-ntd"/>
+                            <constraint firstItem="iJy-Bz-D73" firstAttribute="top" secondItem="UIo-Hr-Sle" secondAttribute="bottom" constant="8" id="Nv1-Dh-fBw"/>
+                            <constraint firstItem="l0z-OM-jKs" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-10" id="Oka-sr-DYD"/>
+                            <constraint firstItem="21W-ZR-DKt" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="5" id="Tgj-WO-esh"/>
+                            <constraint firstItem="jBm-Tc-mAq" firstAttribute="centerY" secondItem="tgJ-kl-MEa" secondAttribute="centerY" id="UOz-B1-8Ue"/>
+                            <constraint firstItem="xqP-oA-ELf" firstAttribute="top" secondItem="jBm-Tc-mAq" secondAttribute="bottom" constant="20" id="Uif-wf-dRn"/>
+                            <constraint firstItem="iJy-Bz-D73" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-10" id="VB6-ri-QB8"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="xqP-oA-ELf" secondAttribute="bottom" constant="10" id="WUV-64-jXX"/>
+                            <constraint firstItem="L93-Yc-2um" firstAttribute="centerY" secondItem="l0z-OM-jKs" secondAttribute="centerY" id="Zd5-nL-fAf"/>
+                            <constraint firstItem="iJy-Bz-D73" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" multiplier="0.47" id="biB-em-LQm"/>
+                            <constraint firstItem="mjo-fU-W5q" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="e6m-Tu-GvF"/>
+                            <constraint firstItem="tbQ-OS-UIU" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" constant="10" id="eSw-N0-ozI"/>
+                            <constraint firstItem="l0z-OM-jKs" firstAttribute="top" secondItem="1Zj-1x-Bz4" secondAttribute="bottom" constant="30" id="ebm-Dd-OL7"/>
+                            <constraint firstItem="tgJ-kl-MEa" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-10" id="exs-qS-EIP"/>
+                            <constraint firstItem="xqP-oA-ELf" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-10" id="faW-93-iZS"/>
+                            <constraint firstItem="1Zj-1x-Bz4" firstAttribute="top" secondItem="21W-ZR-DKt" secondAttribute="bottom" id="h3I-LA-7ZR"/>
+                            <constraint firstItem="tbQ-OS-UIU" firstAttribute="centerY" secondItem="iJy-Bz-D73" secondAttribute="centerY" id="l1r-jr-tIS"/>
+                            <constraint firstItem="UIo-Hr-Sle" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" multiplier="0.75" id="nIu-NV-jBt"/>
+                            <constraint firstItem="mjo-fU-W5q" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" multiplier="0.75" id="oA4-Pk-q20"/>
+                            <constraint firstItem="tbQ-OS-UIU" firstAttribute="width" secondItem="iJy-Bz-D73" secondAttribute="width" id="v30-NB-jxB"/>
+                            <constraint firstItem="UIo-Hr-Sle" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="vrG-xC-yyV"/>
+                            <constraint firstItem="L93-Yc-2um" firstAttribute="leading" secondItem="l0z-OM-jKs" secondAttribute="trailing" constant="60" id="ySw-X7-wnc"/>
                         </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="ySw-X7-wnc"/>
+                            </mask>
+                        </variation>
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
                     <connections>

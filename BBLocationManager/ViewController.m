@@ -80,6 +80,24 @@
     //[manager getCurrentLocationWithDelegate:self]; //can be used
 }
 
+-(IBAction)getContiniousLocation:(id)sender
+{
+    BBLocationManager *manager = [BBLocationManager sharedManager];
+    [manager getContiniousLocationWithDelegate:self];
+}
+
+-(IBAction)getSignificantLocationChange:(id)sender
+{
+    BBLocationManager *manager = [BBLocationManager sharedManager];
+    [manager getSingificantLocationChangeWithDelegate:self];
+}
+
+-(IBAction)stopGettingLocation
+{
+    BBLocationManager *manager = [BBLocationManager sharedManager];
+    [manager stopGettingLocation];
+}
+
 
 -(void)logtext:(NSString*)text
 {
@@ -124,12 +142,14 @@
 -(void)BBLocationManagerDidUpdateLocation:(NSDictionary *)latLongAltitudeDictionary
 {
     NSLog(@"Current Location: %@", latLongAltitudeDictionary.description);
+    [self logtext:[NSString stringWithFormat:@"Current Location: %@ at time: %@", latLongAltitudeDictionary.description, NSDate.date.description]];
 }
 
 
 -(void)BBLocationManagerDidUpdateGeocodeAdress:(NSDictionary *)addressDictionary
 {
      NSLog(@"Current Location GeoCode/Address: %@", addressDictionary.description);
+    [self logtext:[NSString stringWithFormat:@"Current Location: %@ at time: %@", addressDictionary.description, NSDate.date.description]];
 }
 
 #pragma mark-  Other methods

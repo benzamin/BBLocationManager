@@ -1,6 +1,5 @@
 //
 //  BBLocationManager.h
-//  SDK_iOS_DATA
 //
 //  Created by Benzamin on 4/15/15.
 //  Copyright (c) 2015 Benzamin. All rights reserved.
@@ -32,25 +31,25 @@ typedef void(^GeoCodeUpdateBlock)(BOOL success, NSDictionary *geoCodeDictionary,
 @protocol BBLocationManagerDelegate <NSObject>
 
 /**
- *   Gives an BBFenceInfo Object of a Fence just added
+ *   Gives an BBFenceInfo Object of the Fence which just added
  */
 -(void)BBLocationManagerDidAddFence:(BBFenceInfo *)fenceInfo;
 
 
 /**
- *   Gives an BBFenceInfo Object of a Fence just failed to monitor
+ *   Gives an BBFenceInfo Object of the Fence which just failed to monitor
  */
 -(void)BBLocationManagerDidFailedFence:(BBFenceInfo *)fenceInfo;
 
 
 /**
- *   Gives an BBFenceInfo Object of Entered Fence
+ *   Gives an BBFenceInfo Object of a Fence just entered
  */
 -(void)BBLocationManagerDidEnterFence:(BBFenceInfo *)fenceInfo;
 
 
 /**
- *   Gives an BBFenceInfo Object of Exited Fence
+ *   Gives an BBFenceInfo Object of a Exited Fence
  */
 -(void)BBLocationManagerDidExitFence:(BBFenceInfo *)fenceInfo;
 
@@ -62,7 +61,7 @@ typedef void(^GeoCodeUpdateBlock)(BOOL success, NSDictionary *geoCodeDictionary,
 
 
 /**
- *   Gives an Dictionary using current geocode or adress information with BB_ADDRESS_ keys
+ *   Gives an Dictionary using current geocode or adress information with BB_ADDRESS_* keys
  */
 -(void)BBLocationManagerDidUpdateGeocodeAdress:(NSDictionary *)addressDictionary;
 
@@ -75,11 +74,42 @@ typedef void(^GeoCodeUpdateBlock)(BOOL success, NSDictionary *geoCodeDictionary,
     __weak id <BBLocationManagerDelegate> _delegate;
 }
 
+/**
+ *  The delegate, using this the location events are fired.
+ */
 @property (nonatomic, weak) id <BBLocationManagerDelegate> delegate;
+
+/**
+ *  The last known Geocode address determinded, will be nil if there is no geocode was requested.
+ */
 @property (nonatomic, strong) NSDictionary *lastKnownGeocodeAddress;
+
+/**
+ *  The last known location received. Will be nil until a location has been received. Returns an Dictionary using keys BB_LATITUDE, BB_LONGITUDE, BB_ALTITUDE
+ */
 @property (nonatomic, strong) NSDictionary *lastKnownGeoLocation;
 
+/**
+ *  Similar to lastKnownLocation, The last location received. Will be nil until a location has been received. Returns an Dictionary using keys BB_LATITUDE, BB_LONGITUDE, BB_ALTITUDE
+ */
+@property (nonatomic, strong) NSDictionary *location;
 
+/**
+*   The desired location accuracy in meters. Default is 100 meters.
+ *<p>
+ *The location service will try its best to achieve
+    your desired accuracy. However, it is not guaranteed. To optimize
+    power performance, be sure to specify an appropriate accuracy for your usage scenario (eg, use a large accuracy value when only a coarse location is needed). Set it to 0 to achieve the best possible accuracy.
+ *</p>
+*/
+@property(nonatomic, assign) double desiredAcuracy;
+
+/**
+ *  Specifies the minimum update distance in meters. Client will not be notified of movements of less
+    than the stated value, unless the accuracy has improved. Pass in 0 to be
+    notified of all movements. By default, 100 meters is used.
+ */
+@property(nonatomic, assign) double distanceFilter;
 
 /**
  *   Returns a singeton(static) instance of the BBLocationManager
@@ -88,7 +118,7 @@ typedef void(^GeoCodeUpdateBlock)(BOOL success, NSDictionary *geoCodeDictionary,
  *   </p>
  *   @return singeton(static) instance of the BBLocationManager
  */
-+ (id)sharedManager;
++ (instancetype)sharedManager;
 
 
 /**
@@ -133,7 +163,7 @@ typedef void(^GeoCodeUpdateBlock)(BOOL success, NSDictionary *geoCodeDictionary,
 -(void)deleteCurrentFences;
 
 /**
- *   Returns current location through the BBLocationManagerDelegate
+ *   Returns current location through the BBLocationManagerDelegate, can be adjusted using the desiredAcuracy and distanceFilter properties.
  *   <p>
  *   Gives location of device using delegate BBLocationManagerDidUpdateLocation:
  *   </p>
@@ -144,7 +174,7 @@ typedef void(^GeoCodeUpdateBlock)(BOOL success, NSDictionary *geoCodeDictionary,
 
 
 /**
- *   Returns current location
+ *   Returns current location, can be adjusted using the desiredAcuracy and distanceFilter properties.
  *   <p>
  *   Gives location of device using the completion block
  *   </p>
@@ -172,6 +202,34 @@ typedef void(^GeoCodeUpdateBlock)(BOOL success, NSDictionary *geoCodeDictionary,
  */
 - (void)getCurrentGeoCodeAddressWithCompletion:(GeoCodeUpdateBlock)completion;
 
+
+/**
+ *   Returns current location continiously through BBLocationManagerDidUpdateLocation method, can be adjusted using the desiredAcuracy and distanceFilter properties.
+ *   <p>
+ *   Gives the current location continiously until the -stopGettingLocation is called
+ *   </p>
+ *   @return Callback block is called when the location and geocode is updated
+ */
+-(void)getContiniousLocationWithDelegate:(id)delegate;
+
+/**
+ *   Start monitoring significant location changes.  The behavior of this service is not affected by the desiredAccuracy
+    or distanceFilter properties. Returns location if user's is moved significantly, through BBLocationManagerDidUpdateLocation delegate call. Gives the significant location change continiously until the -stopGettingLocation is called
+ *  <p>
+ *  Apps can expect a notification as soon as the device moves 500 meters or more from its previous notification. It should not expect notifications more frequently than once every 5 minutes. If the device is able to retrieve data from the network, the location manager is much more likely to deliver notifications in a timely manner. (from Apple Doc)
+ *  </p>
+ */
+-(void)getSingificantLocationChangeWithDelegate:(id)delegate;
+
+
+/**
+ *   Stops updating location for Continious or Significant changes
+ *   <p>
+ *   Use this method to stop accessing and getting the location data continiously. If you've called -getContiniousLocationWithDelegate: or -getSingificantLocationChangeWithDelegate: method before, call -stopGettingLocation method to stop that.
+ *   </p>
+*/
+-(void)stopGettingLocation;
+
 /**
  *   Adds a geofence at the current location
  *   <p>
@@ -183,7 +241,6 @@ typedef void(^GeoCodeUpdateBlock)(BOOL success, NSDictionary *geoCodeDictionary,
  *   @warning When using this method for adding multiple fence at once, reverse geocoding method may fail for too many request in small amount of time.
  *   @return fires delegate BBLocationManagerDidAddFence: with a BBFenceEventTypeAdded event.
  */
-
 - (void)addGeofenceAtCurrentLocation;
 
 /**
