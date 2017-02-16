@@ -403,7 +403,9 @@ typedef enum : NSUInteger {
             NSString *country = mark.country ? mark.country : @"" ;
             //NSLog(@"Updated Address:%@", mark.addressDictionary.description);
             
-            weakSelf.lastKnownGeocodeAddress = @{
+            weakSelf.lastKnownGeocodeAddress = @{BB_LATITUDE    : [NSNumber numberWithDouble:location.coordinate.latitude],
+                                                 BB_LONGITUDE    : [NSNumber numberWithDouble:location.coordinate.longitude],
+                                                 BB_ALTITUDE    : [NSNumber numberWithDouble:location.altitude],
                                                  BB_ADDRESS_NAME    : name,
                                                  BB_ADDRESS_STREET  : thoroughfare,
                                                  BB_ADDRESS_CITY    : locality,
@@ -418,6 +420,9 @@ typedef enum : NSUInteger {
         else
         {
             weakSelf.lastKnownGeocodeAddress = @{
+                                                 BB_LATITUDE    : @0,
+                                                 BB_LONGITUDE    : @0,
+                                                 BB_ALTITUDE    : @0,
                                                  BB_ADDRESS_NAME    : @"Unknown",
                                                  BB_ADDRESS_STREET  : @"Unknown",
                                                  BB_ADDRESS_CITY    : @"Unknown",

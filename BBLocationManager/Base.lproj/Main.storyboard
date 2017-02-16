@@ -73,13 +73,13 @@
                                 <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
                                 <state key="normal" title="Get Geocode Address"/>
                                 <connections>
-                                    <action selector="getCurrentGeoFence:" destination="BYZ-38-t0r" eventType="touchUpInside" id="YRz-OJ-fRN"/>
+                                    <action selector="getCurrentGeoCodeAddress:" destination="BYZ-38-t0r" eventType="touchUpInside" id="pQf-yz-2Vr"/>
                                 </connections>
                             </button>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="BHQ-aC-7DA">
                                 <rect key="frame" x="6" y="320" width="363" height="337"/>
                             </mapView>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Log:" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xqP-oA-ELf">
+                            <textView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" editable="NO" text="Log:" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xqP-oA-ELf">
                                 <rect key="frame" x="6" y="320" width="363" height="337"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>

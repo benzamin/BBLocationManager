@@ -24,8 +24,6 @@
     manager.delegate = self; //not mandatory here, just to get the delegate calls
     
     [self.mapView setTranslatesAutoresizingMaskIntoConstraints:NO];
-    self.mapView.zoomEnabled = NO;
-    self.mapView.scrollEnabled = NO;
     self.mapView.layer.cornerRadius = 6.0f;
 }
 
@@ -73,18 +71,19 @@
     [manager getCurrentLocationWithCompletion:^(BOOL success, NSDictionary *latLongAltitudeDictionary, NSError *error) {
         
         [self logtext:[NSString stringWithFormat:@"Current Location: %@", latLongAltitudeDictionary.description]];
+        [self showInMapsWithDictionary:latLongAltitudeDictionary title:@"Current Location"];
     }];
     //[manager getCurrentLocationWithDelegate:self]; //can be used
 }
 
--(IBAction)getCurrentGeoFence:(id)sender
+-(IBAction)getCurrentGeoCodeAddress:(id)sender
 {
     
     BBLocationManager *manager = [BBLocationManager sharedManager];
     [manager getCurrentGeoCodeAddressWithCompletion:^(BOOL success, NSDictionary *addressDictionary, NSError *error) {
         //access the dict using BB_LATITUDE, BB_LONGITUDE, BB_ALTITUDE
         [self logtext:[NSString stringWithFormat:@"Current Location GeoCode/Address: %@", addressDictionary.description]];
-        [self showInMapsWithDictionary:addressDictionary];
+        [self showInMapsWithDictionary:addressDictionary title:@"Geocode/Address"];
     }];
     //[manager getCurrentLocationWithDelegate:self]; //can be used
 }
@@ -107,9 +106,14 @@
     [manager stopGettingLocation];
 }
 
--(void)showInMapsWithDictionary:(NSDictionary*)locationDict
+-(void)showInMapsWithDictionary:(NSDictionary*)locationDict title:(NSString*)title
 {
     CLLocationCoordinate2D infiniteLoopCoordinate = CLLocationCoordinate2DMake([locationDict[BB_LATITUDE] floatValue], [locationDict[BB_LONGITUDE] floatValue]);
+    MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
+    [annotation setCoordinate:infiniteLoopCoordinate];
+    [annotation setTitle:title];
+    [self.mapView addAnnotation:annotation];
+    
     self.mapView.region = MKCoordinateRegionMakeWithDistance(infiniteLoopCoordinate, 3000.0f, 3000.0f);
 
 }
@@ -127,7 +131,7 @@
     NSString *text = [NSString stringWithFormat:@"Added GeoFence: %@", fenceInfo.dictionary.description];
     NSLog(@"%@", text);
     [self logtext:text];
-    [self showInMapsWithDictionary:fenceInfo.fenceCoordinate];
+    [self showInMapsWithDictionary:fenceInfo.fenceCoordinate title:@"Added GeoFence"];
 }
 
 -(void)BBLocationManagerDidFailedFence:(BBFenceInfo *)fenceInfo
@@ -135,6 +139,7 @@
     NSString *text = [NSString stringWithFormat:@"Failed to add GeoFence: %@", fenceInfo.dictionary.description];
     NSLog(@"%@", text);
     [self logtext:text];
+    [self showInMapsWithDictionary:fenceInfo.fenceCoordinate title:@"Failed GeoFence"];
 }
 
 
@@ -144,7 +149,7 @@
     NSLog(@"%@", text);
     [self logtext:text];
     [self showLocalNotification:[NSString stringWithFormat:@"Enter Fence %@", text] withDate:[NSDate dateWithTimeIntervalSinceNow:1]];
-    [self showInMapsWithDictionary:fenceInfo.fenceCoordinate];
+    [self showInMapsWithDictionary:fenceInfo.fenceCoordinate title:@"Enter GeoFence"];
 }
 
 
@@ -154,7 +159,7 @@
     NSLog(@"%@", text);
     [self logtext:text];
     [self showLocalNotification:[NSString stringWithFormat:@"Exit Fence %@", text] withDate:[NSDate dateWithTimeIntervalSinceNow:1]];
-    [self showInMapsWithDictionary:fenceInfo.fenceCoordinate];
+    [self showInMapsWithDictionary:fenceInfo.fenceCoordinate title:@"Exit GeoFence"];
 }
 
 
@@ -162,7 +167,7 @@
 {
     NSLog(@"Current Location: %@", latLongAltitudeDictionary.description);
     [self logtext:[NSString stringWithFormat:@"Current Location: %@ at time: %@", latLongAltitudeDictionary.description, NSDate.date.description]];
-    [self showInMapsWithDictionary:latLongAltitudeDictionary];
+    [self showInMapsWithDictionary:latLongAltitudeDictionary title:@"Current Location"];
 }
 
 
@@ -170,7 +175,7 @@
 {
      NSLog(@"Current Location GeoCode/Address: %@", addressDictionary.description);
     [self logtext:[NSString stringWithFormat:@"Current Location: %@ at time: %@", addressDictionary.description, NSDate.date.description]];
-    [self showInMapsWithDictionary:addressDictionary];
+    [self showInMapsWithDictionary:addressDictionary title:@"Geocode Updated"];
 }
 
 #pragma mark-  Other methods
