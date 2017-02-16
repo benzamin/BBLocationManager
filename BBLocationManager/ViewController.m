@@ -8,10 +8,11 @@
 
 #import "ViewController.h"
 #import "BBLocationManager.h"
-
+#import <MapKit/MapKit.h>
 
 @interface ViewController () <BBLocationManagerDelegate> //use this if you want to get response from delegate not from block
 @property(nonatomic, weak) IBOutlet UITextView *logTextView;
+@property(nonatomic, weak) IBOutlet MKMapView *mapView;
 @end
 
 @implementation ViewController
@@ -21,6 +22,11 @@
     // Do any additional setup after loading the view, typically from a nib.
     BBLocationManager *manager = [BBLocationManager sharedManager];
     manager.delegate = self; //not mandatory here, just to get the delegate calls
+    
+    [self.mapView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    self.mapView.zoomEnabled = NO;
+    self.mapView.scrollEnabled = NO;
+    self.mapView.layer.cornerRadius = 6.0f;
 }
 
 -(IBAction)showAllGeoFences:(id)sender
@@ -73,9 +79,12 @@
 
 -(IBAction)getCurrentGeoFence:(id)sender
 {
+    
     BBLocationManager *manager = [BBLocationManager sharedManager];
     [manager getCurrentGeoCodeAddressWithCompletion:^(BOOL success, NSDictionary *addressDictionary, NSError *error) {
+        //access the dict using BB_LATITUDE, BB_LONGITUDE, BB_ALTITUDE
         [self logtext:[NSString stringWithFormat:@"Current Location GeoCode/Address: %@", addressDictionary.description]];
+        [self showInMapsWithDictionary:addressDictionary];
     }];
     //[manager getCurrentLocationWithDelegate:self]; //can be used
 }
@@ -98,6 +107,13 @@
     [manager stopGettingLocation];
 }
 
+-(void)showInMapsWithDictionary:(NSDictionary*)locationDict
+{
+    CLLocationCoordinate2D infiniteLoopCoordinate = CLLocationCoordinate2DMake([locationDict[BB_LATITUDE] floatValue], [locationDict[BB_LONGITUDE] floatValue]);
+    self.mapView.region = MKCoordinateRegionMakeWithDistance(infiniteLoopCoordinate, 3000.0f, 3000.0f);
+
+}
+
 
 -(void)logtext:(NSString*)text
 {
@@ -111,6 +127,7 @@
     NSString *text = [NSString stringWithFormat:@"Added GeoFence: %@", fenceInfo.dictionary.description];
     NSLog(@"%@", text);
     [self logtext:text];
+    [self showInMapsWithDictionary:fenceInfo.fenceCoordinate];
 }
 
 -(void)BBLocationManagerDidFailedFence:(BBFenceInfo *)fenceInfo
@@ -127,6 +144,7 @@
     NSLog(@"%@", text);
     [self logtext:text];
     [self showLocalNotification:[NSString stringWithFormat:@"Enter Fence %@", text] withDate:[NSDate dateWithTimeIntervalSinceNow:1]];
+    [self showInMapsWithDictionary:fenceInfo.fenceCoordinate];
 }
 
 
@@ -136,6 +154,7 @@
     NSLog(@"%@", text);
     [self logtext:text];
     [self showLocalNotification:[NSString stringWithFormat:@"Exit Fence %@", text] withDate:[NSDate dateWithTimeIntervalSinceNow:1]];
+    [self showInMapsWithDictionary:fenceInfo.fenceCoordinate];
 }
 
 
@@ -143,6 +162,7 @@
 {
     NSLog(@"Current Location: %@", latLongAltitudeDictionary.description);
     [self logtext:[NSString stringWithFormat:@"Current Location: %@ at time: %@", latLongAltitudeDictionary.description, NSDate.date.description]];
+    [self showInMapsWithDictionary:latLongAltitudeDictionary];
 }
 
 
@@ -150,6 +170,7 @@
 {
      NSLog(@"Current Location GeoCode/Address: %@", addressDictionary.description);
     [self logtext:[NSString stringWithFormat:@"Current Location: %@ at time: %@", addressDictionary.description, NSDate.date.description]];
+    [self showInMapsWithDictionary:addressDictionary];
 }
 
 #pragma mark-  Other methods

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4B721AC91E55742F00075025 /* default.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 4B721AC81E55742F00075025 /* default.gpx */; };
 		4B7EC4311E3DF6110038CA09 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B7EC4301E3DF6110038CA09 /* main.m */; };
 		4B7EC4341E3DF6110038CA09 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B7EC4331E3DF6110038CA09 /* AppDelegate.m */; };
 		4B7EC4371E3DF6110038CA09 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B7EC4361E3DF6110038CA09 /* ViewController.m */; };
@@ -29,6 +30,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4B721AC81E55742F00075025 /* default.gpx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = default.gpx; sourceTree = "<group>"; };
 		4B7EC42C1E3DF6110038CA09 /* BBLocationManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BBLocationManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B7EC4301E3DF6110038CA09 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4B7EC4321E3DF6110038CA09 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -69,6 +71,7 @@
 		4B7EC4231E3DF6110038CA09 = {
 			isa = PBXGroup;
 			children = (
+				4B721AC81E55742F00075025 /* default.gpx */,
 				4B7EC42E1E3DF6110038CA09 /* BBLocationManager */,
 				4B7EC4481E3DF6120038CA09 /* BBLocationManagerTests */,
 				4B7EC42D1E3DF6110038CA09 /* Products */,
@@ -210,6 +213,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B7EC43F1E3DF6110038CA09 /* LaunchScreen.storyboard in Resources */,
+				4B721AC91E55742F00075025 /* default.gpx in Resources */,
 				4B7EC43C1E3DF6110038CA09 /* Assets.xcassets in Resources */,
 				4B7EC43A1E3DF6110038CA09 /* Main.storyboard in Resources */,
 			);

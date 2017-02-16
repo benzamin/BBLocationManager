@@ -76,10 +76,13 @@
                                     <action selector="getCurrentGeoFence:" destination="BYZ-38-t0r" eventType="touchUpInside" id="YRz-OJ-fRN"/>
                                 </connections>
                             </button>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="BHQ-aC-7DA">
+                                <rect key="frame" x="6" y="320" width="363" height="337"/>
+                            </mapView>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Log:" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xqP-oA-ELf">
                                 <rect key="frame" x="6" y="320" width="363" height="337"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <dataDetectorType key="dataDetectorTypes" phoneNumber="YES" link="YES" address="YES"/>
                             </textView>
@@ -137,12 +140,16 @@
                             <constraint firstItem="mjo-fU-W5q" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="e6m-Tu-GvF"/>
                             <constraint firstItem="tbQ-OS-UIU" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" constant="10" id="eSw-N0-ozI"/>
                             <constraint firstItem="l0z-OM-jKs" firstAttribute="top" secondItem="1Zj-1x-Bz4" secondAttribute="bottom" constant="30" id="ebm-Dd-OL7"/>
+                            <constraint firstItem="BHQ-aC-7DA" firstAttribute="trailing" secondItem="xqP-oA-ELf" secondAttribute="trailing" id="eeI-BO-uu9"/>
                             <constraint firstItem="tgJ-kl-MEa" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-10" id="exs-qS-EIP"/>
                             <constraint firstItem="xqP-oA-ELf" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-10" id="faW-93-iZS"/>
                             <constraint firstItem="1Zj-1x-Bz4" firstAttribute="top" secondItem="21W-ZR-DKt" secondAttribute="bottom" id="h3I-LA-7ZR"/>
                             <constraint firstItem="tbQ-OS-UIU" firstAttribute="centerY" secondItem="iJy-Bz-D73" secondAttribute="centerY" id="l1r-jr-tIS"/>
+                            <constraint firstItem="BHQ-aC-7DA" firstAttribute="bottom" secondItem="xqP-oA-ELf" secondAttribute="bottom" id="l4S-Pd-fYA"/>
+                            <constraint firstItem="BHQ-aC-7DA" firstAttribute="top" secondItem="xqP-oA-ELf" secondAttribute="top" id="mnM-sY-aLh"/>
                             <constraint firstItem="UIo-Hr-Sle" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" multiplier="0.75" id="nIu-NV-jBt"/>
                             <constraint firstItem="mjo-fU-W5q" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" multiplier="0.75" id="oA4-Pk-q20"/>
+                            <constraint firstItem="BHQ-aC-7DA" firstAttribute="leading" secondItem="xqP-oA-ELf" secondAttribute="leading" id="qF2-o0-kgM"/>
                             <constraint firstItem="tbQ-OS-UIU" firstAttribute="width" secondItem="iJy-Bz-D73" secondAttribute="width" id="v30-NB-jxB"/>
                             <constraint firstItem="UIo-Hr-Sle" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="vrG-xC-yyV"/>
                             <constraint firstItem="L93-Yc-2um" firstAttribute="leading" secondItem="l0z-OM-jKs" secondAttribute="trailing" constant="60" id="ySw-X7-wnc"/>
@@ -156,6 +163,7 @@
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
                     <connections>
                         <outlet property="logTextView" destination="xqP-oA-ELf" id="Bv5-C1-ywP"/>
+                        <outlet property="mapView" destination="BHQ-aC-7DA" id="NdM-d3-jW3"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
