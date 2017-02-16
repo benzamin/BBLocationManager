@@ -13,6 +13,7 @@
 @interface ViewController () <BBLocationManagerDelegate> //use this if you want to get response from delegate not from block
 @property(nonatomic, weak) IBOutlet UITextView *logTextView;
 @property(nonatomic, weak) IBOutlet MKMapView *mapView;
+@property(nonatomic, strong) MKPointAnnotation *annotation;
 @end
 
 @implementation ViewController
@@ -25,6 +26,8 @@
     
     [self.mapView setTranslatesAutoresizingMaskIntoConstraints:NO];
     self.mapView.layer.cornerRadius = 6.0f;
+    self.annotation = [[MKPointAnnotation alloc] init];
+    
 }
 
 -(IBAction)showAllGeoFences:(id)sender
@@ -109,10 +112,10 @@
 -(void)showInMapsWithDictionary:(NSDictionary*)locationDict title:(NSString*)title
 {
     CLLocationCoordinate2D infiniteLoopCoordinate = CLLocationCoordinate2DMake([locationDict[BB_LATITUDE] floatValue], [locationDict[BB_LONGITUDE] floatValue]);
-    MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
-    [annotation setCoordinate:infiniteLoopCoordinate];
-    [annotation setTitle:title];
-    [self.mapView addAnnotation:annotation];
+    
+    [self.annotation setCoordinate:infiniteLoopCoordinate];
+    [self.annotation setTitle:title];;
+    [self.mapView addAnnotation:self.annotation];
     
     self.mapView.region = MKCoordinateRegionMakeWithDistance(infiniteLoopCoordinate, 3000.0f, 3000.0f);
 
