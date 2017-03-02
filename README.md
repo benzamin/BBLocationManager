@@ -9,6 +9,8 @@ A Location Manager for easily implementing location services & geofencing in iOS
 * High performance, easy to use, battery friendly, use via block or delegate. 
 * Example App included for demonstrating all the features.
 
+![Current location and GeoCode](https://raw.githubusercontent.com/benzamin/BBLocationManager/master/screens/locationNgeofence.gif  "Getting current location and Geocode")
+
 ## Getting Started
 [Location services](https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/LocationAwarenessPG/CoreLocation/CoreLocation.html) is a powerful feature of iOS, but sometimes its not easy to understand all the API's and learn how to use them. With BBLocationManager, you can start using iOS Location Services API in no time. It provides good code documentation for better understanding of the methods and delegates. If you are making a location aware app or building a geofencing app like the [Alarm](https://developer.apple.com/library/content/documentation/DataManagement/Conceptual/EventKitProgGuide/ConfiguringAlarms/ConfiguringAlarms.html) app in iOS which reminds you to buy milk when you are near home, BBLocationManager can be your choice.
 
@@ -20,6 +22,9 @@ What things you need to install the software and how to install them
 ```
 Give examples
 ```
+
+![Geofence and alert](https://raw.githubusercontent.com/benzamin/BBLocationManager/master/screens/geofence.gif  "Adding Geofence and getting alert")
+![Geofence Alert](https://raw.githubusercontent.com/benzamin/BBLocationManager/master/screens/geofence-alert.gif  "Geofence enter/exit alert while app in background/exited")
 
 ### Installing
 
