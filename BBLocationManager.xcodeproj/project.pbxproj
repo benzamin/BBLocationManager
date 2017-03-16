@@ -15,7 +15,6 @@
 		4B7EC43C1E3DF6110038CA09 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B7EC43B1E3DF6110038CA09 /* Assets.xcassets */; };
 		4B7EC43F1E3DF6110038CA09 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B7EC43D1E3DF6110038CA09 /* LaunchScreen.storyboard */; };
 		4B7EC44A1E3DF6120038CA09 /* BBLocationManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B7EC4491E3DF6120038CA09 /* BBLocationManagerTests.m */; };
-		4B7EC4581E3E1A470038CA09 /* BBFenceInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B7EC4541E3E1A470038CA09 /* BBFenceInfo.m */; };
 		4B7EC4591E3E1A470038CA09 /* BBLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B7EC4561E3E1A470038CA09 /* BBLocationManager.m */; };
 /* End PBXBuildFile section */
 
@@ -44,8 +43,6 @@
 		4B7EC4451E3DF6120038CA09 /* BBLocationManagerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BBLocationManagerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B7EC4491E3DF6120038CA09 /* BBLocationManagerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BBLocationManagerTests.m; sourceTree = "<group>"; };
 		4B7EC44B1E3DF6120038CA09 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		4B7EC4541E3E1A470038CA09 /* BBFenceInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BBFenceInfo.m; path = BBLocationManagerClasses/BBFenceInfo.m; sourceTree = "<group>"; };
-		4B7EC4551E3E1A470038CA09 /* BBFenceInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BBFenceInfo.h; path = BBLocationManagerClasses/BBFenceInfo.h; sourceTree = "<group>"; };
 		4B7EC4561E3E1A470038CA09 /* BBLocationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BBLocationManager.m; path = BBLocationManagerClasses/BBLocationManager.m; sourceTree = "<group>"; };
 		4B7EC4571E3E1A470038CA09 /* BBLocationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BBLocationManager.h; path = BBLocationManagerClasses/BBLocationManager.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -124,8 +121,6 @@
 		4B7EC45A1E3E1A4F0038CA09 /* BBLocationManagerClasses */ = {
 			isa = PBXGroup;
 			children = (
-				4B7EC4551E3E1A470038CA09 /* BBFenceInfo.h */,
-				4B7EC4541E3E1A470038CA09 /* BBFenceInfo.m */,
 				4B7EC4571E3E1A470038CA09 /* BBLocationManager.h */,
 				4B7EC4561E3E1A470038CA09 /* BBLocationManager.m */,
 			);
@@ -234,7 +229,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B7EC4371E3DF6110038CA09 /* ViewController.m in Sources */,
-				4B7EC4581E3E1A470038CA09 /* BBFenceInfo.m in Sources */,
 				4B7EC4341E3DF6110038CA09 /* AppDelegate.m in Sources */,
 				4B7EC4591E3E1A470038CA09 /* BBLocationManager.m in Sources */,
 				4B7EC4311E3DF6110038CA09 /* main.m in Sources */,
