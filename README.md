@@ -15,59 +15,152 @@ A Location Manager for easily implementing location services & geofencing in iOS
 [Location services](https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/LocationAwarenessPG/CoreLocation/CoreLocation.html) is a powerful feature of iOS, but sometimes its not easy to understand all the API's and learn how to use them. With BBLocationManager, you can start using iOS Location Services API in no time. It provides good code documentation for better understanding of the methods and delegates. If you are making a location aware app or building a geofencing app like the [Alarm](https://developer.apple.com/library/content/documentation/DataManagement/Conceptual/EventKitProgGuide/ConfiguringAlarms/ConfiguringAlarms.html) app in iOS which reminds you to buy milk when you are near home, BBLocationManager can be your choice.
 
 
-### Prerequisites
+## Installation
+BBLocationManager can be installed through Cocoapods or manually. You can check out the example project by [downloading the full source code](https://github.com/benzamin/BBLocationManager/archive/master.zip)
 
-What things you need to install the software and how to install them
+### Installing with CocoaPods
 
+[CocoaPods](http://cocoapods.org) is very popular dependency manager for iOS projects. It automates and simplifies the process of using 3rd-party libraries like BBLocation in your projects. If you don't have cocoapods installed in your mac already, you can install it with the following command:
+
+```bash
+$ gem install cocoapods
 ```
-Give examples
+
+#### Podfile
+If you already have a Podfile, add the following line in your podfile:
+
+```ruby
+pod 'BBLocationManager'
+```
+
+If you already dont have a podfile, To integrate BBLocationManager into your Xcode project using CocoaPods, create and add it in your `Podfile`:
+
+```ruby
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, '7.0'
+
+target 'YourTargetName' do
+pod 'BBLocationManager'
+end
+```
+
+Then, run the following command:
+
+```bash
+$ pod install
+```
+And the pod should be installed in your project. PLEASE NOTE: Close the yourProject.xcodeProj and open the yourProject.xcworkspace, as the pod has been initiated, from now one use the yourProject.xcworkspace to work with. Please refer to [CocoaPods](http://cocoapods.org) for detailed info.
+
+#### Manual Installation
+Just add the BBLocationManager.h and BBLocationManager.m files in your project [From Here](https://github.com/benzamin/BBLocationManager/tree/master/BBLocationManager/BBLocationManagerClasses). Import the BBLocationManager.h file in your class where you need location support.
+
+
+## Usage
+
+`[BBLocationManager sharedManager]` creates an singleton class of `BBLocationManager` and manages everything from here. You can either use `BBLocationManagerDelegate` to get location/geofence related callbacks, or use Objective-C blocks to get location. For useing Geofence, the `BBFenceInfo` is a easy to use object, using which `BBLocationManager` delivers fence related data to your class. You can use `lastKnownGeocodeAddress` and `lastKnownGeoLocation` properties to get the last location/geocode the class got before.
+
+#### Getting current location (Using Block)
+
+```objective-c
+BBLocationManager *manager = [BBLocationManager sharedManager];
+    [manager getCurrentLocationWithCompletion:^(BOOL success, NSDictionary *latLongAltitudeDictionary, NSError *error) {
+        //access the 'latLongAltitudeDictionary' dictionary using BB_LATITUDE, BB_LONGITUDE, BB_ALTITUDE key
+        NSLog(@"Current Location latitude: %@", latLongAltitudeDictionary[BB_LATITUDE]);
+    }];
+```
+#### Getting current location (Using Delegate)
+
+```objective-c
+BBLocationManager *manager = [BBLocationManager sharedManager];
+[manager getCurrentLocationWithDelegate:self];  
+......
+......
+#pragma mark - BBLocationManagerDelegate methods
+-(void)BBLocationManagerDidUpdateLocation:(NSDictionary *)latLongAltitudeDictionary
+{
+    //access the 'latLongAltitudeDictionary' dictionary using BB_LATITUDE, BB_LONGITUDE, BB_ALTITUDE key
+    NSLog(@"Current Location Latitude: %@", latLongAltitudeDictionary[BB_LATITUDE]);
+}
+```
+#### Getting current geocode/address (Using Block)
+
+```objective-c
+BBLocationManager *manager = [BBLocationManager sharedManager];
+    [manager getCurrentGeoCodeAddressWithCompletion:^(BOOL success, NSDictionary *addressDictionary, NSError *error) {
+        //access the dict using BB_LATITUDE, BB_LONGITUDE, BB_ALTITUDE, BB_ADDRESS_NAME, BB_ADDRESS_STREET, BB_ADDRESS_CITY, BB_ADDRESS_STATE, BB_ADDRESS_COUNTY, BB_ADDRESS_ZIPCODE, BB_ADDRESS_COUNTY, BB_ADDRESS_DICTIONARY
+        NSLog(NSString stringWithFormat:@"Current GeoCode/Address: %@", addressDictionary.description);
+    }];
 ```
 
 ![Geofence and alert](https://raw.githubusercontent.com/benzamin/BBLocationManager/master/screens/geofence.gif  "Adding Geofence and getting alert")
 ![Geofence Alert](https://raw.githubusercontent.com/benzamin/BBLocationManager/master/screens/geofence-alert.gif  "Geofence enter/exit alert while app in background/exited")
 
-### Installing
+#### Add a geofence in current location
 
-A step by step series of examples that tell you have to get a development env running
+```objective-c
+BBLocationManager *manager = [BBLocationManager sharedManager];
+manager.delegate = self;
+[manager addGeofenceAtCurrentLocation];
+/*****can be also done using one of the following methods *****/
+//[manager addGeofenceAtCurrentLocationWithRadious:100];
+//[manager addGeofenceAtlatitude:59.331981f andLongitude:18.068435f withRadious:100 withIdentifier:@"MyFence-1";
+//[manager addGeofenceAtCurrentLocationWithRadious:100 withIdentifier:@"MyFence-1"];
+//[manager addGeofenceAtCoordinates:CLLocationCoordinate2DMake(59.331981f, 18.068435f) withRadious:100 withIdentifier:@"MyFence-1"];
+//[manager addGeofenceAtCoordinates:CLLocationCoordinate2DMake(59.331981f, 18.068435f) withRadious:100 withIdentifier:nil];//If you provide identifier name 'nil', BBLocationManager will automatically asign a identifier string
+ ```
+ 
+ #### Get all added geofences 
 
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
+```objective-c
+ BBLocationManager *manager = [BBLocationManager sharedManager];
+    
+    NSArray *geoFences = [manager getCurrentFences];
+    NSString *allFencetxt = @"All fences: ";
+    for (BBFenceInfo *geofence in geoFences)
+    {
+        NSString *txt = [NSString stringWithFormat:@"Geofence '%@' is Active at Coordinates: %@:%@ with %@ meter radious \n", geofence.fenceIDentifier, [geofence.fenceCoordinate objectForKey:BB_LATITUDE],[geofence.fenceCoordinate objectForKey:BB_LONGITUDE], [geofence.fenceCoordinate objectForKey:BB_RADIOUS]];
+        NSLog(@"%@", txt);
+    }
 ```
 
-### And coding style tests
+ #### Delete a spefific geofence
 
-Explain what these tests test and why
-
+```objective-c
+ BBLocationManager *manager = [BBLocationManager sharedManager];
+[manager deleteGeoFenceWithIdentifier:@"My-Geofence-3"];
 ```
-Give an example
+
+#### Get Continious location
+
+```objective-c
+BBLocationManager *manager = [BBLocationManager sharedManager];
+[manager getContiniousLocationWithDelegate:self];
+```
+#### Get Significant location change
+
+```objective-c
+BBLocationManager *manager = [BBLocationManager sharedManager];
+[manager getSingificantLocationChangeWithDelegate:self];
+```
+#### Stop getting all kind of location
+
+```objective-c
+BBLocationManager *manager = [BBLocationManager sharedManager];
+[manager stopGettingLocation];
+```
+#### BBLocationManagerDelegate methods
+```objective-c
+-(void)BBLocationManagerDidAddFence:(BBFenceInfo *)fenceInfo;
+-(void)BBLocationManagerDidFailedFence:(BBFenceInfo *)fenceInf
+-(void)BBLocationManagerDidEnterFence:(BBFenceInfo *)fenceInfo
+-(void)BBLocationManagerDidExitFence:(BBFenceInfo *)fenceInfo;
+-(void)BBLocationManagerDidUpdateLocation:(NSDictionary *)latLongAltitudeDictionary;
+-(void)BBLocationManagerDidUpdateGeocodeAdress:(NSDictionary *)addressDictionary;
 ```
 
-## Deployment
 
-Add additional notes about how to deploy this on a live system
 
+ 
 ## Built With
 
 * [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
