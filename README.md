@@ -184,7 +184,7 @@ BBLocationManager *manager = [BBLocationManager sharedManager];
  
 ## Other Reads
 
-* [BBLocationManager: Simple yet powerfull](http://www.redgreen.studio/blog) - A blog post on BBLocationManager.
+* [BBLocationManager: Simple yet powerfull](http://redgreen.studio/blog/2017/03/21/bblocationmanager-simple-yet-powerfull/) - A blog post on BBLocationManager.
 
 ## Issues and Contributions
 
