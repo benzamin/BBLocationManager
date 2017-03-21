@@ -1,5 +1,4 @@
-![BBLocationManager](https://raw.githubusercontent.com/benzamin/BBLocationManager/master/screens/BBLocationManager-logo.png)
-
+![BBLocationManager](https://raw.githubusercontent.com/benzamin/BBLocationManager/master/screens/BBLocationManager-logo.png)   
 A Location Manager for easily implementing location services & geofencing in iOS, written in Objective-C.
 
 ## Features
