@@ -3,11 +3,12 @@
 A Location Manager for easily implementing location services & geofencing in iOS, written in Objective-C.
 
 ## Features
-* Get current/continious/frequent location and get current geocode/address.
-* Add or remove [Geofence](https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/LocationAwarenessPG/RegionMonitoring/RegionMonitoring.html) at current/given location. Get callback via delegate when user enter/exit a geofence, supports foreground/background, even when [app is not running](https://developer.apple.com/reference/corelocation/cllocationmanager#//apple_ref/doc/uid/TP40007125-CH3-SW32).
-* Read location permission status and ask for permisssion.
-* High performance, easy to use, battery friendly, use via block or delegate. 
-* Example App included for demonstrating all the features.
+
+* Get current/continious/frequent location and get current geocode/address with simple API call. 
+* Add or remove [Geofence](https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/LocationAwarenessPG/RegionMonitoring/RegionMonitoring.html) at current/given location. Get callback via delegate when user enter/exit a geofence, supports foreground/background, even when [app is not running](https://developer.apple.com/reference/corelocation/cllocationmanager#//apple_ref/doc/uid/TP40007125-CH3-SW32). 
+* Read location permission status and if not provided ask for location permisssion automatically. 
+* High performance, easy to use, battery friendly, use via block or delegate. Stops automatically when location update is not required. 
+* [Example App](https://github.com/benzamin/BBLocationManager/archive/master.zip) included for demonstrating all the features. Supports iOS 6.0 and later. 
 
 ![Current location and GeoCode](https://raw.githubusercontent.com/benzamin/BBLocationManager/master/screens/locationNgeofence.gif  "Getting current location and Geocode")
 
@@ -17,6 +18,7 @@ A Location Manager for easily implementing location services & geofencing in iOS
 
 ## Installation
 BBLocationManager can be installed through Cocoapods or manually. You can check out the example project by [downloading the full source code](https://github.com/benzamin/BBLocationManager/archive/master.zip)
+>> Supports iOS 6.0 and later.
 
 ### Installing with CocoaPods
 
@@ -54,19 +56,30 @@ And the pod should be installed in your project. PLEASE NOTE: Close the yourProj
 #### Manual Installation
 Just add the BBLocationManager.h and BBLocationManager.m files in your project [From Here](https://github.com/benzamin/BBLocationManager/tree/master/BBLocationManager/BBLocationManagerClasses). Import the BBLocationManager.h file in your class where you need location support.
 
+## Permission
+BBLocationManager automatically reads the current location permission status of the app and requests for permission if needed. But you need to provide some information in your info.plist file of your project depending on the minimum iOS version you are trageting. For iOS Version earlier then 8.0, a description of your purpose is recommended to provide by setting a string for the key `NSLocationUsageDescription` in your app's Info.plist file.
+
+### For iOS 8 and later
+Starting with iOS 8, you MUST provide a description for how your app uses location services by setting a string for the key `NSLocationWhenInUseUsageDescription` or `NSLocationAlwaysUsageDescription` in your app's Info.plist file. BBLocationManager automatically reads which level of permissions to request based on which description key you provide. You should only request the minimum permission level that your app requires, therefore it is recommended that you use the "When In Use" level unless you require more access. If you provide values for both description keys, the more permissive "Always" level is requested. 
+Also, if you want to get loation update in background (even when app not running), you MUST provide a key called `UIBackgroundModes` and add a item called `location` inside it. Please see the attached image for these keys:
+ 
+![Setting the keys in info.plist](https://raw.githubusercontent.com/benzamin/BBLocationManager/master/screens/keys.png  "Configure these keys correctly, otherwise the location update might not work correctly.")
 
 ## Usage
 
-`[BBLocationManager sharedManager]` creates an singleton class of `BBLocationManager` and manages everything from here. You can either use `BBLocationManagerDelegate` to get location/geofence related callbacks, or use Objective-C blocks to get location. For useing Geofence, the `BBFenceInfo` is a easy to use object, using which `BBLocationManager` delivers fence related data to your class. You can use `lastKnownGeocodeAddress` and `lastKnownGeoLocation` properties to get the last location/geocode the class got before.
+First import `BBLocationManager.h` header in your class. Calling `[BBLocationManager sharedManager]` creates an singleton class of `BBLocationManager` and manages everything from here. You can either use `BBLocationManagerDelegate` to get location/geofence related callbacks, or use Objective-C blocks to get location. For useing Geofence, the `BBFenceInfo` is a easy to use object, using which `BBLocationManager` delivers fence related data to your class. You can use `lastKnownGeocodeAddress` and `lastKnownGeoLocation` properties to get the last location/geocode the class got before.
 
 #### Getting current location (Using Block)
-
+Get BBLocationManager's shared instance, set the `desiredAcuracy` and `distanceFilter` parameter as you like, then request for current location using block or delegate.
 ```objective-c
 BBLocationManager *manager = [BBLocationManager sharedManager];
-    [manager getCurrentLocationWithCompletion:^(BOOL success, NSDictionary *latLongAltitudeDictionary, NSError *error) {
+manager.desiredAcuracy = 100; //how accurate you want your location, in meters   
+manager.distanceFilter = 500; //you'll be notified if user moves away 500 meters from his initial location
+[manager getCurrentLocationWithCompletion:^(BOOL success, NSDictionary *latLongAltitudeDictionary, NSError *error) {
         //access the 'latLongAltitudeDictionary' dictionary using BB_LATITUDE, BB_LONGITUDE, BB_ALTITUDE key
         NSLog(@"Current Location latitude: %@", latLongAltitudeDictionary[BB_LATITUDE]);
-    }];
+}];
+//[manager getCurrentLocationWithDelegate:self]; //can also be used to get location update through -BBLocationManagerDidUpdateLocation: delegate callback
 ```
 #### Getting current location (Using Delegate)
 
@@ -150,12 +163,15 @@ BBLocationManager *manager = [BBLocationManager sharedManager];
 ```
 #### BBLocationManagerDelegate methods
 ```objective-c
+-(void)BBLocationManagerDidUpdateLocation:(NSDictionary *)latLongAltitudeDictionary;
+
+-(void)BBLocationManagerDidUpdateGeocodeAdress:(NSDictionary *)addressDictionary;
+
 -(void)BBLocationManagerDidAddFence:(BBFenceInfo *)fenceInfo;
 -(void)BBLocationManagerDidFailedFence:(BBFenceInfo *)fenceInf
 -(void)BBLocationManagerDidEnterFence:(BBFenceInfo *)fenceInfo
 -(void)BBLocationManagerDidExitFence:(BBFenceInfo *)fenceInfo;
--(void)BBLocationManagerDidUpdateLocation:(NSDictionary *)latLongAltitudeDictionary;
--(void)BBLocationManagerDidUpdateGeocodeAdress:(NSDictionary *)addressDictionary;
+
 ```
 
 
