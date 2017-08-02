@@ -760,6 +760,7 @@ typedef enum : NSUInteger {
     if(![CLLocationManager locationServicesEnabled])
     {
         //You need to enable Location Services
+        return NO;
     }
     if(![CLLocationManager isMonitoringAvailableForClass:[CLRegion class]])
     {
