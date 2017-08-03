@@ -577,10 +577,10 @@ typedef enum : NSUInteger {
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-    if (locations && [locations count])
+    if (locations && [locations count] >= 1)
     {
         // Fetch Current Location
-        CLLocation *location = [locations objectAtIndex:0];
+        CLLocation *location = [locations lastObject];
         
         if(self.activeLocationTaskType == LocationTaskTypeGetGeoCodeAddress)
         {
