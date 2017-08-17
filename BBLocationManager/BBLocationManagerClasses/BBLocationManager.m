@@ -99,10 +99,52 @@ typedef enum : NSUInteger {
 
 -(void)getPermissionForStartUpdatingLocation
 {
-    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) //before iOS 8, no permission was needed to access location
+    CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
+    
+    //******************* IMPORTANT FOR iOS 11 ***************************//
+    // 1. For app "WHEN IN USE" location access, you need to add "NSLocationWhenInUseUsageDescription" in info.plist
+    // 2. But if you need "ALWAYS" location access, you need BOTH "NSLocationWhenInUseUsageDescription" and "NSLocationAlwaysAndWhenInUseUsageDescription"
+    //    in your info.plist, other wise it'll encounter error: "This app has attempted to access privacy-sensitive data without a usage description ..... "
+    // Ref: https://developer.apple.com/documentation/corelocation/choosing_the_authorization_level_for_location_services#topics
+    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0"))
     {
-        CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
-        
+        if ((status == kCLAuthorizationStatusNotDetermined) && ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)] || [self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]))
+        {
+            if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysAndWhenInUseUsageDescription"]) { //https://developer.apple.com/documentation/corelocation/choosing_the_authorization_level_for_location_services/request_always_authorization
+                if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"]) {
+                    [self.locationManager performSelector:@selector(requestAlwaysAuthorization)];
+                }
+                else{
+                    [[NSException exceptionWithName:@"[BBLocationManager] Fix needed for location permission key" reason:@"Your app's info.plist need both NSLocationWhenInUseUsageDescription and NSLocationAlwaysAndWhenInUseUsageDescription keys for asking 'Always usage of location' in iOS 11" userInfo:nil] raise];
+                }
+                
+            } else if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"]) { //https://developer.apple.com/documentation/corelocation/choosing_the_authorization_level_for_location_services/requesting_when_in_use_authorization
+                [self.locationManager performSelector:@selector(requestWhenInUseAuthorization)];
+            } else {
+                [[NSException exceptionWithName:@"[BBLocationManager] Fix needed for location permission key" reason:@"Your app's info.plist does not contain NSLocationWhenInUseUsageDescription and/or NSLocationAlwaysAndWhenInUseUsageDescription key required for iOS 11" userInfo:nil] raise];
+            }
+        }
+        else if(status == kCLAuthorizationStatusDenied || status == kCLAuthorizationStatusRestricted){
+            NSLog(@"[BBLocationManager] Location Permission Denied by user, prompt user to allow location permission.");
+            NSString *title, *message;
+            if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysAndWhenInUseUsageDescription"]) {
+                title = (status == kCLAuthorizationStatusDenied) ? @"Location services are off" : @"Background location is not enabled";
+                message = @"To use background location you must turn on 'Always' in the Location Services Settings";
+            } else if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"]) {
+                title = (status == kCLAuthorizationStatusDenied) ? @"Location services are off" : @"Location Service is not enabled";
+                message = @"To use location you must turn on 'While Using the App' in the Location Services Settings";
+            }
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:title
+                                                                message:message
+                                                               delegate:self
+                                                      cancelButtonTitle:@"Cancel"
+                                                      otherButtonTitles:@"Settings", nil];
+            [alertView show];
+        }
+    }
+    //before iOS 8, no permission was needed to access location
+    else if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0"))
+    {
         if ((status == kCLAuthorizationStatusNotDetermined) && ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)] || [self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]))
         {
             if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"]) {
@@ -488,7 +530,7 @@ typedef enum : NSUInteger {
 - (void)startUpdatingLocation
 {
     [self getPermissionForStartUpdatingLocation];
-    if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"]) {
+    if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"] || [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysAndWhenInUseUsageDescription"]) {
         if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIBackgroundModes"])
         {
             BOOL hasLocationBackgroundMode = NO;
@@ -503,7 +545,7 @@ typedef enum : NSUInteger {
             }
             if(!hasLocationBackgroundMode)
             {
-                [[NSException exceptionWithName:@"[BBLocationManager] UIBackgroundModes not enabled" reason:@"Info.plist does not contain 'UIBackgroundModes' key with a 'location' string in it, which is required for background location access 'NSLocationAlwaysUsageDescription'" userInfo:nil] raise];
+                [[NSException exceptionWithName:@"[BBLocationManager] UIBackgroundModes not enabled" reason:@"Your apps info.plist does not contain 'UIBackgroundModes' key with a 'location' string in it, which is required for background location access 'NSLocationAlwaysAndWhenInUseUsageDescription' for iOS 11 or 'NSLocationAlwaysUsageDescription' for iOS 10" userInfo:nil] raise];
             }
             else{
                 if ([self.locationManager respondsToSelector:@selector(setAllowsBackgroundLocationUpdates:)])
@@ -513,7 +555,7 @@ typedef enum : NSUInteger {
             }
         }
         else{
-            [[NSException exceptionWithName:@"[BBLocationManager] UIBackgroundModes not enabled" reason:@"Info.plist does not contain 'UIBackgroundModes' key with a 'location' string in it, which is required for background location access 'NSLocationAlwaysUsageDescription'" userInfo:nil] raise];
+            [[NSException exceptionWithName:@"[BBLocationManager] UIBackgroundModes not enabled" reason:@"Your apps info.plist does not contain 'UIBackgroundModes' key with a 'location' string in it, which is required for background location access 'NSLocationAlwaysAndWhenInUseUsageDescription' for iOS 11 or 'NSLocationAlwaysUsageDescription' for iOS 10" userInfo:nil] raise];
         }
 
     }
@@ -574,6 +616,9 @@ typedef enum : NSUInteger {
     return CLLocationCoordinate2DMake([[fenceInfo.fenceCoordinate objectForKey:BB_LATITUDE] doubleValue], [[fenceInfo.fenceCoordinate objectForKey:BB_LONGITUDE] doubleValue]);
 }
 #pragma mark - CLLocationManagerDelegate methods
+
+
+#warning check out this one https://stackoverflow.com/questions/22292835/how-to-stop-multiple-times-method-calling-of-didupdatelocations-in-ios
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
@@ -775,7 +820,7 @@ typedef enum : NSUInteger {
     }
     
     if (isPermitted && SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0") && locationPermission == kCLAuthorizationStatusNotDetermined) {
-        isPermitted = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"] || [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"];
+        isPermitted = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"] || [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"] || [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysAndWhenInUseUsageDescription"];
     }
     
     return isPermitted;

@@ -22,10 +22,12 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSLocationAlwaysUsageDescription</key>
+	<key>NSLocationAlwaysUsageDescription - INACTIVE</key>
 	<string>Application need to use your location permission for background activity</string>
-	<key>NSLocationWhenInUseUsageDescription-INACTIVE</key>
+	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Application need to use your location permission when using the app</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Application need to use your location permission for background activity</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
