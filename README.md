@@ -1,5 +1,5 @@
 ![BBLocationManager](https://raw.githubusercontent.com/benzamin/BBLocationManager/master/screens/BBLocationManager-logo.png)   
-A Location Manager for easily implementing location services & geofencing in iOS, written in Objective-C.
+A Location Manager for easily implementing location services & geofencing in iOS, written in Objective-C. **Ready for iOS 11.**
 
 ## Features
 
@@ -56,11 +56,19 @@ And the pod should be installed in your project. **PLEASE NOTE:** Close the your
 Just add the BBLocationManager.h and BBLocationManager.m files in your project [From Here](https://github.com/benzamin/BBLocationManager/tree/master/BBLocationManager/BBLocationManagerClasses). Import the BBLocationManager.h file in your class where you need location support.
 
 ## Permission
-BBLocationManager automatically reads the current location permission status of the app and requests for permission if needed. But you need to provide some information in your info.plist file of your project depending on the minimum iOS version you are trageting. For iOS Version earlier then 8.0, a description of your purpose is recommended to provide by setting a string for the key `NSLocationUsageDescription` in your app's Info.plist file.
+BBLocationManager automatically reads the current location permission status of the app and requests for permission if needed. But you need to provide some information in your info.plist file of your project depending on the minimum iOS version you are trageting. For iOS Version **earlier then 8.0**, a description of your purpose is recommended to provide by setting a string for the key `NSLocationUsageDescription` in your app's Info.plist file.
+
+#### For iOS 11 and later
+For **iOS 11** provide a description for how your app uses location services by setting a string for the key `NSLocationWhenInUseUsageDescription` or `NSLocationAlwaysAndWhenInUseUsageDescription` in your app's Info.plist file. When you build your app using the iOS 11 SDK, you are now required to provide an NSLocationWhenInUseUsageDescription key in all cases (if you use location at all). For “Always” access, you can additionally provide a second key, which is now called NSLocationAlwaysAndWhenInUseUsageDescription. If you only provide NSLocationAlwaysAndWhenInUseUsageDescription but not NSLocationWhenInUseUsageDescription, asking for “Always” access will not work. The old iOS 8/9/10 key NSLocationAlwaysUsageDescription is now only needed for backwards compatibility, if you’re still making the app available to iOS 10 or earlier users. It’s not needed or used on iOS 11 devices.
+
+BBLocationManager automatically reads which level of permissions to request based on which description key you provide. You should only request the minimum permission level that your app requires, therefore it is recommended that you use the "When In Use" level unless you require more access. If you want to get **loation update in background** (even when app not running), you **MUST** provide a key called `UIBackgroundModes` and add a item called `location` inside it. Please see the attached image for these keys for iOS 11 with compatibility:
+ 
+![Setting the keys in info.plist](https://raw.githubusercontent.com/benzamin/BBLocationManager/master/screens/iOS-11-keys.png  "Configure these keys correctly for iOS 11, otherwise the location update might not work correctly.")
+
 
 #### For iOS 8 and later
 Starting with **iOS 8, you MUST** provide a description for how your app uses location services by setting a string for the key `NSLocationWhenInUseUsageDescription` or `NSLocationAlwaysUsageDescription` in your app's Info.plist file. BBLocationManager automatically reads which level of permissions to request based on which description key you provide. You should only request the minimum permission level that your app requires, therefore it is recommended that you use the "When In Use" level unless you require more access. If you provide values for both description keys, the more permissive "Always" level is requested. 
-Also, if you want to get **loation update in background** (even when app not running), you **MUST** provide a key called `UIBackgroundModes` and add a item called `location` inside it. Please see the attached image for these keys:
+Also, if you want to get **loation update in background** (even when app not running), you **MUST** provide a key called `UIBackgroundModes` and add a item called `location` inside it. Please see the attached image for these keys for iOS 8/9/10:
  
 ![Setting the keys in info.plist](https://raw.githubusercontent.com/benzamin/BBLocationManager/master/screens/keys.png  "Configure these keys correctly, otherwise the location update might not work correctly.")
 
