@@ -60,7 +60,14 @@ typedef void(^LocationUpdateBlock)(BOOL success, NSDictionary *locationDictionar
 typedef void(^GeoCodeUpdateBlock)(BOOL success, NSDictionary *geoCodeDictionary, NSError *error);
 
 @protocol BBLocationManagerDelegate <NSObject>
+@required
+/**
+ *   Gives an Location Dictionary using keys "latitude", "longitude" and "altitude". You can use these macros: BB_LATITUDE, BB_LONGITUDE and BB_ALTITUDE.
+ *   Sample output dictionary @{ @"latitude" : 23.6850, "longitude" : 90.3563, "altitude" : 10.4604}
+ */
+-(void)BBLocationManagerDidUpdateLocation:(NSDictionary *)latLongAltitudeDictionary;
 
+@optional
 /**
  *   Gives an BBFenceInfo Object of the Fence which just added
  */
@@ -83,12 +90,6 @@ typedef void(^GeoCodeUpdateBlock)(BOOL success, NSDictionary *geoCodeDictionary,
  *   Gives an BBFenceInfo Object of a Exited Fence
  */
 -(void)BBLocationManagerDidExitFence:(BBFenceInfo *)fenceInfo;
-
-
-/**
- *   Gives an Location Dictionary using keys BB_LATITUDE, BB_LONGITUDE, BB_ALTITUDE
-*/
--(void)BBLocationManagerDidUpdateLocation:(NSDictionary *)latLongAltitudeDictionary;
 
 
 /**
