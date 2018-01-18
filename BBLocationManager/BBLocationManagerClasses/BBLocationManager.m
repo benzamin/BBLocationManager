@@ -127,12 +127,12 @@ typedef enum : NSUInteger {
         else if(status == kCLAuthorizationStatusDenied || status == kCLAuthorizationStatusRestricted){
             NSLog(@"[BBLocationManager] Location Permission Denied by user, prompt user to allow location permission.");
             NSString *title, *message;
-            if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysAndWhenInUseUsageDescription"]) {
+            if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"]) {
                 title = (status == kCLAuthorizationStatusDenied) ? @"Location services are off" : @"Background location is not enabled";
-                message = @"To use background location you must turn on 'Always' in the Location Services Settings";
+                message = [NSString stringWithFormat:@"%@. %@", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"], @"To use background location you must turn on 'Always' in the Location Services Settings"];
             } else if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"]) {
                 title = (status == kCLAuthorizationStatusDenied) ? @"Location services are off" : @"Location Service is not enabled";
-                message = @"To use location you must turn on 'While Using the App' in the Location Services Settings";
+                message = [NSString stringWithFormat:@"%@. %@",[[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"], @"To use location you must turn on 'While Using the App' in the Location Services Settings"];
             }
             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:title
                                                                 message:message
@@ -160,10 +160,10 @@ typedef enum : NSUInteger {
             NSString *title, *message;
             if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"]) {
                 title = (status == kCLAuthorizationStatusDenied) ? @"Location services are off" : @"Background location is not enabled";
-                 message = @"To use background location you must turn on 'Always' in the Location Services Settings";
+                message = [NSString stringWithFormat:@"%@. %@", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"], @"To use background location you must turn on 'Always' in the Location Services Settings"];
             } else if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"]) {
                 title = (status == kCLAuthorizationStatusDenied) ? @"Location services are off" : @"Location Service is not enabled";
-                 message = @"To use location you must turn on 'While Using the App' in the Location Services Settings";
+                message = [NSString stringWithFormat:@"%@. %@",[[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"], @"To use location you must turn on 'While Using the App' in the Location Services Settings"];
             }
             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:title
                                                                 message:message
