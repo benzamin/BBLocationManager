@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   s.version  = '1.1'
   s.license  = 'MIT'
   s.description  = <<-DESC
-            A Location Manager for easily implementing location services & geofencing in iOS, written in Objective-C.
+            A Location Manager for easily implementing location services & geofencing in iOS, written in Objective-C. iOS 11 Ready.
                    DESC
 
   s.summary  = 'A Location Manager for easily implementing location services & geofencing in iOS'
