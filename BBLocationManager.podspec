@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name     = 'BBLocationManager'
-  s.version  = '1.0'
+  s.version  = '1.1'
   s.license  = 'MIT'
   s.description  = <<-DESC
             A Location Manager for easily implementing location services & geofencing in iOS, written in Objective-C.
